@@ -1,5 +1,6 @@
 package org.mifos.pheevouchermanagementsystem.data;
 
+import liquibase.pro.packaged.S;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,4 +21,5 @@ public class VoucherInstruction {
     private String narration;
     private String voucherNumber;
     private String serialNumber;
+    private String status;
 }

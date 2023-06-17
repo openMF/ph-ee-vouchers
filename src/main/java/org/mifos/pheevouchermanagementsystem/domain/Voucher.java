@@ -68,6 +68,9 @@ public class Voucher {
         this.instructionId = instructionId;
         this.requestId = requestId;
     }
+    public Voucher(){
+
+    }
 
     public Long getId() {
         return id;

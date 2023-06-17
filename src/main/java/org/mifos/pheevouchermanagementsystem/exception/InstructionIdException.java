@@ -7,7 +7,7 @@ public class InstructionIdException extends RuntimeException{
         super(message);
     }
 
-    public static InstructionIdException payeeIdentityNotFound(final String instructionId) {
+    public static InstructionIdException instructionIdNotFound(final String instructionId) {
         String stringWithPlaceHolder = "Instruction ID with {0} already exist!";
         return new InstructionIdException(MessageFormat.format(stringWithPlaceHolder,instructionId));
     }
