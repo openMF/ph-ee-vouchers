@@ -78,8 +78,8 @@ public class CreateVoucherService {
 @Transactional
     public void addVouchers(VoucherInstruction voucherInstruction, List<SuccessfulVouchers> successfulVouchers, List<ErrorTracking> errorTrackingList, RequestDTO request){
         String serialNumber = generateUniqueNumber(14);
-        String voucherNumber = hashVoucherNumber(serialNumber,generateUniqueNumber(18));
-        Voucher voucher =  new Voucher(serialNumber, voucherNumber,voucherInstruction.getAmount(),voucherInstruction.getCurrency(),voucherInstruction.getGroupCode()
+        String voucherNumber = generateUniqueNumber(18);
+        Voucher voucher =  new Voucher(serialNumber, hashVoucherNumber(voucherNumber),voucherInstruction.getAmount(),voucherInstruction.getCurrency(),voucherInstruction.getGroupCode()
         ,INACTIVE.getValue(),null,LocalDateTime.now(),null, voucherInstruction.getPayeeFunctionalID(), request.getBatchID(),voucherInstruction.getInstructionID(),request.getRequestID());
         try {
             voucherRepository.save(voucher);

@@ -31,7 +31,7 @@ dependencies {
 	implementation 'mysql:mysql-connector-java:8.0.26'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation('io.rest-assured:rest-assured:4.4.0')
-
+	implementation "org.springdoc:springdoc-openapi-ui:1.6.11"
 }
 
 tasks.named('test') {

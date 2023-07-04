@@ -17,7 +17,9 @@ public class SendCallbackService {
                 .baseUri(callbackURL)
                 .body(body)
                 .when()
-                .post();
+                .put()
+                .then()
+                .statusCode(200);
     }
 
 }
