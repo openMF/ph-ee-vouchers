@@ -6,6 +6,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class EncryptVoucher {
+
     public static String hashVoucherNumberSalting(String serialNumber, String voucherNumber) {
         // Concatenate the serialNumber and voucherNumber
         StringBuilder saltedInputBuilder = new StringBuilder(serialNumber);

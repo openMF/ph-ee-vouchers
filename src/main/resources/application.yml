@@ -23,3 +23,6 @@ async:
   queue_capacity: 100
 
 expiry_time: 60
+
+salting:
+  enabled: true
