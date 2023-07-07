@@ -5,7 +5,8 @@ public enum VoucherStatusEnum {
     ACTIVE("02"),
     CANCELLED("03"),
     EXPIRED("04"),
-    UTILIZED("05");
+    UTILIZED("05"),
+    SUSPENDED("06");
     private final String value;
     VoucherStatusEnum(String value) {
         this.value = value;

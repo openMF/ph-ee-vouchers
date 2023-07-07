@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import static org.mifos.pheevouchermanagementsystem.util.EncryptVoucher.hashVoucherNumber;
 import static org.mifos.pheevouchermanagementsystem.util.RedemptionStatusEnum.FAILURE;
 import static org.mifos.pheevouchermanagementsystem.util.RedemptionStatusEnum.SUCCESS;
 import static org.mifos.pheevouchermanagementsystem.util.UniqueIDGenerator.generateUniqueNumber;
@@ -38,12 +39,12 @@ public class RedeemVoucherService {
         try {
             voucher = voucherRepository.findBySerialNo(redeemVoucherRequestDTO.getVoucherSerialNumber()).orElseThrow(() -> VoucherNotFoundException.voucherNotFound(redeemVoucherRequestDTO.getVoucherSerialNumber()));
             //Boolean validate = validateVoucher(voucher);
-            if(voucher.getStatus().equals(ACTIVE.getValue()) && voucher.getExpiryDate().toLocalDate().isAfter(LocalDate.now())) {
+            if(voucher.getStatus().equals(ACTIVE.getValue()) && voucher.getExpiryDate().toLocalDate().isAfter(LocalDate.now()) && voucher.getVoucherNo().equals(hashVoucherNumber(redeemVoucherRequestDTO.getVoucherSecretNumber()))) {
                 voucher.setStatus(UTILIZED.getValue());
                 voucherRepository.save(voucher);
 
             } else {
-                return new RedeemVoucherResponseDTO(FAILURE.getValue(), "Voucher Not Valid!", redeemVoucherRequestDTO.getVoucherSerialNumber(), voucher.getAmount().toString(), LocalDateTime.now().toString(), transactionId);
+                return new RedeemVoucherResponseDTO(FAILURE.getValue(), "Voucher Details Invalid!", redeemVoucherRequestDTO.getVoucherSerialNumber(), voucher.getAmount().toString(), LocalDateTime.now().toString(), transactionId);
             }
             }catch (RuntimeException  e) {
             logger.error(e.getMessage());
