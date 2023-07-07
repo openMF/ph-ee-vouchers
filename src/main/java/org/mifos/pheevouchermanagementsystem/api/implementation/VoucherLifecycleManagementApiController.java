@@ -37,7 +37,7 @@ public class VoucherLifecycleManagementApiController implements VoucherLifecycle
             }
             else if(command.equals("redeem")){
                 redeemVoucherRequestDTO = objectMapper.convertValue(requestBody, RedeemVoucherRequestDTO.class);
-                return ResponseEntity.status(HttpStatus.OK).body((T) redeemVoucherRequestDTO);
+                return ResponseEntity.status(HttpStatus.OK).body((T) redeemVoucherService.redeemVoucher(redeemVoucherRequestDTO));
             }
         } catch (Exception e) {
             ResponseDTO responseDTO = new ResponseDTO(FAILED_RESPONSE_CODE.getValue(), FAILED_RESPONSE_MESSAGE.getValue(), requestDTO.getRequestID());

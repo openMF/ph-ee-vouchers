@@ -1,8 +1,6 @@
 package org.mifos.pheevouchermanagementsystem.api.definition;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.mifos.pheevouchermanagementsystem.data.RequestDTO;
-import org.mifos.pheevouchermanagementsystem.data.ResponseDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
