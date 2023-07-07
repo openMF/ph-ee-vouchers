@@ -6,20 +6,27 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class EncryptVoucher {
-    public static String hashVoucherNumber(String serialNumber, String voucherNumber) {
+    public static String hashVoucherNumberSalting(String serialNumber, String voucherNumber) {
+        // Concatenate the serialNumber and voucherNumber
+        StringBuilder saltedInputBuilder = new StringBuilder(serialNumber);
+        saltedInputBuilder.append(voucherNumber);
+        return hash(saltedInputBuilder.toString());
+    }
+
+    public static String hashVoucherNumber(String voucherNumber) {
+        return hash(voucherNumber);
+    }
+
+    public static String hash(String value){
         try {
             // Create a MessageDigest instance with SHA algorithm
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
 
-            // Concatenate the serialNumber and voucherNumber
-            StringBuilder saltedInputBuilder = new StringBuilder(serialNumber);
-            saltedInputBuilder.append(voucherNumber);
-
             // Convert the salted input to bytes
-            byte[] saltedInputBytes = saltedInputBuilder.toString().getBytes(StandardCharsets.UTF_8);
+            byte[] inputBytes = value.getBytes(StandardCharsets.UTF_8);
 
             // Hash the salted input bytes
-            byte[] hashedBytes = digest.digest(saltedInputBytes);
+            byte[] hashedBytes = digest.digest(inputBytes);
 
             // Convert the hashed bytes to a hexadecimal string
             StringBuilder hexString = new StringBuilder();

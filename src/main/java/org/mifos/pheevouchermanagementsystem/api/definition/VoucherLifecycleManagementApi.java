@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.concurrent.ExecutionException;
 
 public interface VoucherLifecycleManagementApi {
-    @PutMapping("/voucher")
+    @PutMapping("/vouchers")
     ResponseDTO voucherStatusChange(@RequestHeader(value="X-CallbackURL") String callbackURL,
                                     @RequestBody RequestDTO requestBody, @RequestParam(value = "command") String command) throws ExecutionException, InterruptedException, JsonProcessingException;
 }

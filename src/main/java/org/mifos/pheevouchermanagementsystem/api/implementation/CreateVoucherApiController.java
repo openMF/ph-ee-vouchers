@@ -21,9 +21,9 @@ public class CreateVoucherApiController implements CreateVoucherApi {
         try {
             createVoucherService.createVouchers(requestBody, callbackURL);
         } catch (Exception e) {
-            return new ResponseDTO(FAILED_RESPONSE_CODE.getValue(), FAILED_RESPONSE_MESSAGE.getValue(), requestBody.getRequestID());
+            return new ResponseDTO(FAILED_RESPONSE.getValue(), FAILED_RESPONSE.getMessage(), requestBody.getRequestID());
 
         }
-        return new ResponseDTO(SUCCESS_RESPONSE_CODE.getValue(), SUCCESS_RESPONSE_MESSAGE.getValue(), requestBody.getRequestID());
+        return new ResponseDTO(SUCCESS_RESPONSE.getValue(), SUCCESS_RESPONSE.getMessage(), requestBody.getRequestID());
     }
 }

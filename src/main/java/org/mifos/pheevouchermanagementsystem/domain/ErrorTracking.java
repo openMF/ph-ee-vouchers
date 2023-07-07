@@ -3,7 +3,7 @@ package org.mifos.pheevouchermanagementsystem.domain;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "error_tracking")
+@Table(name = "error")
 public class ErrorTracking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

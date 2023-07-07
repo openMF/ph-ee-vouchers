@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.concurrent.ExecutionException;
 
 import static org.mifos.pheevouchermanagementsystem.util.VoucherManagementEnum.*;
-import static org.mifos.pheevouchermanagementsystem.util.VoucherManagementEnum.SUCCESS_RESPONSE_MESSAGE;
 
 @RestController
 public class VoucherLifecycleManagementApiController implements VoucherLifecycleManagementApi {
@@ -24,10 +23,10 @@ public class VoucherLifecycleManagementApiController implements VoucherLifecycle
             if(command.equals("activate")){
                 activateVoucherService.activateVouchers(requestBody, callbackURL);
             }        } catch (Exception e) {
-            return new ResponseDTO(FAILED_RESPONSE_CODE.getValue(), FAILED_RESPONSE_MESSAGE.getValue(), requestBody.getRequestID());
+            return new ResponseDTO(FAILED_RESPONSE.getValue(), FAILED_RESPONSE.getMessage(), requestBody.getRequestID());
 
         }
-        return new ResponseDTO(SUCCESS_RESPONSE_CODE.getValue(), SUCCESS_RESPONSE_MESSAGE.getValue(), requestBody.getRequestID());
+        return new ResponseDTO(SUCCESS_RESPONSE.getValue(), SUCCESS_RESPONSE.getMessage(), requestBody.getRequestID());
 
     }
 }
