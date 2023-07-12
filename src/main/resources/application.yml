@@ -1,0 +1,25 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/VoucherManagement
+    username: root
+    password: mysql
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  liquibase:
+    enabled: true
+    default-schema: VoucherManagement
+    change-log: classpath:/db/changelog/changelog.xml
+    clear-checksums: true
+
+logging:
+  level:
+    ROOT: INFO
+
+async:
+  core_pool_size: 10
+  max_pool_size: 10
+  queue_capacity: 100
+
+expiry_time: 60
