@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.concurrent.ExecutionException;
 
 import static org.mifos.pheevouchermanagementsystem.util.VoucherManagementEnum.*;
-import static org.mifos.pheevouchermanagementsystem.util.VoucherManagementEnum.SUCCESS_RESPONSE_MESSAGE;
 
 @RestController
 public class VoucherLifecycleManagementApiController implements VoucherLifecycleManagementApi {
@@ -30,29 +29,29 @@ public class VoucherLifecycleManagementApiController implements VoucherLifecycle
     @Autowired
     VoucherLifecycleService voucherLifecycleService;
     @Override
-    public <T> ResponseEntity<T> voucherStatusChange(String callbackURL, Object requestBody, String command) throws ExecutionException, InterruptedException, JsonProcessingException {
+    public <T> ResponseEntity<T> voucherStatusChange(String callbackURL, String registeringInstitutionId, Object requestBody, String command) throws ExecutionException, InterruptedException, JsonProcessingException {
         RequestDTO requestDTO = null;
         RedeemVoucherRequestDTO redeemVoucherRequestDTO = null;
         try {
             if(command.equals("activate")){
                 requestDTO = objectMapper.convertValue(requestBody, RequestDTO.class);
-                activateVoucherService.activateVouchers(requestDTO, callbackURL);
+                activateVoucherService.activateVouchers(requestDTO, callbackURL, registeringInstitutionId);
             }
             else if(command.equals("redeem")){
                 redeemVoucherRequestDTO = objectMapper.convertValue(requestBody, RedeemVoucherRequestDTO.class);
-                return ResponseEntity.status(HttpStatus.OK).body((T) redeemVoucherService.redeemVoucher(redeemVoucherRequestDTO));
+                return ResponseEntity.status(HttpStatus.OK).body((T) redeemVoucherService.redeemVoucher(redeemVoucherRequestDTO, registeringInstitutionId));
             }
             else if(command.equals("suspend")){
                 requestDTO = objectMapper.convertValue(requestBody, RequestDTO.class);
-                voucherLifecycleService.suspendVoucher(requestDTO, callbackURL);
+                voucherLifecycleService.suspendVoucher(requestDTO, callbackURL, registeringInstitutionId);
             }
             else if(command.equals("reactivate")){
                 requestDTO = objectMapper.convertValue(requestBody, RequestDTO.class);
-                voucherLifecycleService.reactivateVoucher(requestDTO, callbackURL);
+                voucherLifecycleService.reactivateVoucher(requestDTO, callbackURL, registeringInstitutionId);
             }
             else if(command.equals("cancel")){
                 requestDTO = objectMapper.convertValue(requestBody, RequestDTO.class);
-                voucherLifecycleService.cancelVoucher(requestDTO, callbackURL);
+                voucherLifecycleService.cancelVoucher(requestDTO, callbackURL, registeringInstitutionId);
             }
         } catch (Exception e) {
             ResponseDTO responseDTO = new ResponseDTO(FAILED_RESPONSE.getValue(), FAILED_RESPONSE.getValue(), requestDTO.getRequestID());

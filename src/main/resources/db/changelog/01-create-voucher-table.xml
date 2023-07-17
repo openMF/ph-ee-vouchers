@@ -21,6 +21,7 @@
         <column name="batch_id" type="VARCHAR(255)"/>
         <column name="instruction_id" type="VARCHAR(255)"/>
         <column name="request_id" type="VARCHAR(255)"/>
+        <column name="registering_institution_id" type="VARCHAR(255)"/>
     </createTable>
 </changeSet>
 </databaseChangeLog>

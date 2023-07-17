@@ -17,7 +17,7 @@ public class VoucherValidityApiController implements VoucherValidityApi {
     @Autowired
     VoucherValidityService voucherValidityService;
     @Override
-    public ResponseEntity<ResponseDTO> voucherValidity(String callbackURL, String serialNumber, String voucherNumber, String groupCode, Boolean isValid) throws ExecutionException, InterruptedException {
+    public ResponseEntity<ResponseDTO> voucherValidity(String callbackURL, String registeringInstitutionId, String serialNumber, String voucherNumber, String groupCode, Boolean isValid) throws ExecutionException, InterruptedException {
         try{
         voucherValidityService.getVoucherValidity(serialNumber, voucherNumber, groupCode, callbackURL);
         }catch (Exception e) {

@@ -33,13 +33,14 @@ public class RedeemVoucherService {
         this.objectMapper = objectMapper;
     }
 
-    public RedeemVoucherResponseDTO redeemVoucher(RedeemVoucherRequestDTO redeemVoucherRequestDTO){
+    public RedeemVoucherResponseDTO redeemVoucher(RedeemVoucherRequestDTO redeemVoucherRequestDTO, String registeringInstitutionId){
         String transactionId =  generateUniqueNumber(10);
         Voucher voucher = null;
         try {
             voucher = voucherRepository.findBySerialNo(redeemVoucherRequestDTO.getVoucherSerialNumber()).orElseThrow(() -> VoucherNotFoundException.voucherNotFound(redeemVoucherRequestDTO.getVoucherSerialNumber()));
             //Boolean validate = validateVoucher(voucher);
-            if(voucher.getStatus().equals(ACTIVE.getValue()) && voucher.getExpiryDate().toLocalDate().isAfter(LocalDate.now()) && voucher.getVoucherNo().equals(hashVoucherNumber(redeemVoucherRequestDTO.getVoucherSecretNumber()))) {
+            if(voucher.getStatus().equals(ACTIVE.getValue()) && voucher.getExpiryDate().toLocalDate().isAfter(LocalDate.now())
+                    && voucher.getVoucherNo().equals(hashVoucherNumber(redeemVoucherRequestDTO.getVoucherSecretNumber())) && voucher.getRegisteringInstitutionId().equals(registeringInstitutionId)) {
                 voucher.setStatus(UTILIZED.getValue());
                 voucherRepository.save(voucher);
 

@@ -16,11 +16,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.mifos.pheevouchermanagementsystem.service.ActivateVoucherService.validateRegisteringInstitutionId;
 import static org.mifos.pheevouchermanagementsystem.util.VoucherStatusEnum.*;
 
 @Service
@@ -42,10 +44,10 @@ public class VoucherLifecycleService {
     }
 
     @Async("asyncExecutor")
-    public void suspendVoucher(RequestDTO request, String callbackURL){
+    public void suspendVoucher(RequestDTO request, String callbackURL, String registeringInstitutionId){
         List<VoucherInstruction> voucherInstructionList = request.getVoucherInstructions();
         List<FailedCaseDTO> failedCaseList = new ArrayList<>();
-        validateAndSuspendVouchers(voucherInstructionList, request, failedCaseList);
+        validateAndSuspendVouchers(voucherInstructionList, request, failedCaseList, registeringInstitutionId);
         try {
             sendCallbackService.sendCallback(objectMapper.writeValueAsString(new VoucherLifecycleCallbackResponseDTO(UniqueIDGenerator.generateUniqueNumber(12), request.getRequestID(), failedCaseList.size(), failedCaseList)), callbackURL);
         } catch (JsonProcessingException e) {
@@ -53,10 +55,10 @@ public class VoucherLifecycleService {
         }
     }
     @Async("asyncExecutor")
-    public void reactivateVoucher(RequestDTO request, String callbackURL){
+    public void reactivateVoucher(RequestDTO request, String callbackURL, String registeringInstitutionId){
         List<VoucherInstruction> voucherInstructionList = request.getVoucherInstructions();
         List<FailedCaseDTO> failedCaseList = new ArrayList<>();
-        validateAndSuspendVouchers(voucherInstructionList, request, failedCaseList);
+        validateAndReactivateVouchers(voucherInstructionList, request, failedCaseList, registeringInstitutionId);
         try {
             sendCallbackService.sendCallback(objectMapper.writeValueAsString(new VoucherLifecycleCallbackResponseDTO(UniqueIDGenerator.generateUniqueNumber(12), request.getRequestID(), failedCaseList.size(), failedCaseList)), callbackURL);
         } catch (JsonProcessingException e) {
@@ -64,23 +66,28 @@ public class VoucherLifecycleService {
         }
     }
     @Async("asyncExecutor")
-    public void cancelVoucher(RequestDTO request, String callbackURL){
+    public void cancelVoucher(RequestDTO request, String callbackURL, String registeringInstitutionId){
         List<VoucherInstruction> voucherInstructionList = request.getVoucherInstructions();
         List<FailedCaseDTO> failedCaseList = new ArrayList<>();
-        validateAndReactivateVouchers(voucherInstructionList, request, failedCaseList);
+        validateAndCancelVouchers(voucherInstructionList, request, failedCaseList, registeringInstitutionId);
         try {
             sendCallbackService.sendCallback(objectMapper.writeValueAsString(new VoucherLifecycleCallbackResponseDTO(UniqueIDGenerator.generateUniqueNumber(12), request.getRequestID(), failedCaseList.size(), failedCaseList)), callbackURL);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
-    public void validateAndReactivateVouchers(List<VoucherInstruction> voucherInstructionList, RequestDTO request, List<FailedCaseDTO> failedCaseList){
+    public void validateAndReactivateVouchers(List<VoucherInstruction> voucherInstructionList, RequestDTO request, List<FailedCaseDTO> failedCaseList, String registeringInstitutionId){
         voucherInstructionList.stream().forEach(voucherInstruction -> {
             String requestID = request.getRequestID();
-            Boolean voucherValidation = validateVoucher(voucherInstruction, request);
+            Boolean voucherValidation = validateVoucherForReactivate(voucherInstruction, request);
             if (voucherValidation) {
                 Voucher voucher = voucherRepository.findBySerialNo(voucherInstruction.getSerialNumber()).orElseThrow(() -> VoucherNotFoundException.voucherNotFound(voucherInstruction.getSerialNumber()));
-                changeStatus(voucher, ACTIVE.getValue());
+                if(validateRegisteringInstitutionId(voucher, registeringInstitutionId)) {
+                    changeStatus(voucher, ACTIVE.getValue());                }
+                else {
+                    FailedCaseDTO failedCase =   new FailedCaseDTO(voucherInstruction.getSerialNumber(), "The voucher provided in the request does not correspond to the same registering ID.");
+                    failedCaseList.add(failedCase);
+                }
             } else {
                 FailedCaseDTO failedCase =   new FailedCaseDTO(voucherInstruction.getSerialNumber(), "Voucher validation failed.");
                 failedCaseList.add(failedCase);
@@ -88,13 +95,19 @@ public class VoucherLifecycleService {
         });
     }
 
-    public void validateAndSuspendVouchers(List<VoucherInstruction> voucherInstructionList, RequestDTO request, List<FailedCaseDTO> failedCaseList){
+    public void validateAndSuspendVouchers(List<VoucherInstruction> voucherInstructionList, RequestDTO request, List<FailedCaseDTO> failedCaseList, String registeringInstitutionId)
+    {
         voucherInstructionList.stream().forEach(voucherInstruction -> {
             String requestID = request.getRequestID();
-            Boolean voucherValidation = validateVoucher(voucherInstruction, request);
+            Boolean voucherValidation = validateVoucherForSuspend(voucherInstruction, request);
             if (voucherValidation) {
                 Voucher voucher = voucherRepository.findBySerialNo(voucherInstruction.getSerialNumber()).orElseThrow(() -> VoucherNotFoundException.voucherNotFound(voucherInstruction.getSerialNumber()));
-                changeStatus(voucher, SUSPENDED.getValue());
+                if(validateRegisteringInstitutionId(voucher, registeringInstitutionId)) {
+                    changeStatus(voucher, SUSPENDED.getValue());                }
+                else {
+                    FailedCaseDTO failedCase =   new FailedCaseDTO(voucherInstruction.getSerialNumber(), "The voucher provided in the request does not correspond to the same registering ID.");
+                    failedCaseList.add(failedCase);
+                }
             } else {
                 FailedCaseDTO failedCase =   new FailedCaseDTO(voucherInstruction.getSerialNumber(), "Voucher validation failed.");
                 failedCaseList.add(failedCase);
@@ -102,13 +115,18 @@ public class VoucherLifecycleService {
         });
     }
 
-    public void validateAndCancelVouchers(List<VoucherInstruction> voucherInstructionList, RequestDTO request, List<FailedCaseDTO> failedCaseList){
+    public void validateAndCancelVouchers(List<VoucherInstruction> voucherInstructionList, RequestDTO request, List<FailedCaseDTO> failedCaseList, String registeringInstitutionId){
         voucherInstructionList.stream().forEach(voucherInstruction -> {
             String requestID = request.getRequestID();
-            Boolean voucherValidation = validateVoucher(voucherInstruction, request);
+            Boolean voucherValidation = validateVoucherForCancel(voucherInstruction, request);
             if (voucherValidation) {
                 Voucher voucher = voucherRepository.findBySerialNo(voucherInstruction.getSerialNumber()).orElseThrow(() -> VoucherNotFoundException.voucherNotFound(voucherInstruction.getSerialNumber()));
-                changeStatus(voucher, CANCELLED.getValue());
+                if(validateRegisteringInstitutionId(voucher, registeringInstitutionId)) {
+                    changeStatus(voucher, CANCELLED.getValue());                }
+                else {
+                    FailedCaseDTO failedCase =   new FailedCaseDTO(voucherInstruction.getSerialNumber(), "The voucher provided in the request does not correspond to the same registering ID.");
+                    failedCaseList.add(failedCase);
+                }
             } else {
                 FailedCaseDTO failedCase =   new FailedCaseDTO(voucherInstruction.getSerialNumber(), "Voucher validation failed.");
                 failedCaseList.add(failedCase);
@@ -116,16 +134,35 @@ public class VoucherLifecycleService {
         });
     }
 
-    public Boolean validateVoucher(VoucherInstruction voucherInstruction, RequestDTO request){
+    public Boolean validateVoucherForReactivate(VoucherInstruction voucherInstruction, RequestDTO request){
         if(voucherRepository.existsBySerialNo(voucherInstruction.getSerialNumber())){
             Voucher voucher = voucherRepository.findBySerialNo(voucherInstruction.getSerialNumber()).orElseThrow(() -> VoucherNotFoundException.voucherNotFound(voucherInstruction.getSerialNumber()));
-            return !voucher.getStatus().equals(EXPIRED.getValue()) && !voucher.getStatus().equals(CANCELLED.getValue()) && !voucher.getExpiryDate().toLocalDate().isAfter(LocalDate.now());
+            return !voucher.getStatus().equals(EXPIRED.getValue()) && !voucher.getStatus().equals(UTILIZED.getValue()) && !voucher.getStatus().equals(CANCELLED.getValue());
+        }
+        return false;
+    }
+    public Boolean validateVoucherForCancel(VoucherInstruction voucherInstruction, RequestDTO request){
+        if(voucherRepository.existsBySerialNo(voucherInstruction.getSerialNumber())){
+            Voucher voucher = voucherRepository.findBySerialNo(voucherInstruction.getSerialNumber()).orElseThrow(() -> VoucherNotFoundException.voucherNotFound(voucherInstruction.getSerialNumber()));
+            return !voucher.getStatus().equals(EXPIRED.getValue()) && !voucher.getStatus().equals(UTILIZED.getValue()) && !voucher.getStatus().equals(CANCELLED.getValue());
+        }
+        return false;
+    }
+    public Boolean validateVoucherForSuspend(VoucherInstruction voucherInstruction, RequestDTO request){
+        if(voucherRepository.existsBySerialNo(voucherInstruction.getSerialNumber())){
+            Voucher voucher = voucherRepository.findBySerialNo(voucherInstruction.getSerialNumber()).orElseThrow(() -> VoucherNotFoundException.voucherNotFound(voucherInstruction.getSerialNumber()));
+            return !voucher.getStatus().equals(EXPIRED.getValue()) && !voucher.getStatus().equals(CANCELLED.getValue()) && !voucher.getStatus().equals(UTILIZED.getValue());
         }
         return false;
     }
 
+    @Transactional
     public void changeStatus(Voucher voucher, String status){
         voucher.setStatus(status);
-        voucherRepository.save(voucher);
+        try {
+            voucherRepository.save(voucher);
+        }catch (RuntimeException e){
+            logger.error(e.getMessage());
+        }
     }
 }

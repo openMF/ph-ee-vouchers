@@ -8,6 +8,6 @@ import java.util.concurrent.ExecutionException;
 
 public interface VoucherLifecycleManagementApi {
     @PutMapping("/vouchers")
-    <T> ResponseEntity<T> voucherStatusChange(@RequestHeader(value="X-CallbackURL") String callbackURL,
+    <T> ResponseEntity<T> voucherStatusChange(@RequestHeader(value="X-CallbackURL") String callbackURL, @RequestHeader(value = "registeringInstitutionId") String registeringInstitutionId,
                                                     @RequestBody Object requestBody, @RequestParam(value = "command") String command) throws ExecutionException, InterruptedException, JsonProcessingException;
 }

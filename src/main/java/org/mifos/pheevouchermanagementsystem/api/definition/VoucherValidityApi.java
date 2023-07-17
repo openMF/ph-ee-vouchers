@@ -9,7 +9,7 @@ import java.util.concurrent.ExecutionException;
 
 public interface VoucherValidityApi {
     @GetMapping("/voucher/validity")
-    ResponseEntity<ResponseDTO> voucherValidity(@RequestHeader(value="X-CallbackURL") String callbackURL,
+    ResponseEntity<ResponseDTO> voucherValidity(@RequestHeader(value="X-CallbackURL") String callbackURL, @RequestHeader(value = "registeringInstitutionId") String registeringInstitutionId,
                                                 @RequestParam(value = "serialNumber", required = false) String serialNumber, @RequestParam(value = "voucherNumber", required = false) String voucherNumber,
                                                 @RequestParam(value = "groupCode", required = false) String groupCode, @RequestParam(value = "isValid") Boolean isValid) throws ExecutionException, InterruptedException;
 }
