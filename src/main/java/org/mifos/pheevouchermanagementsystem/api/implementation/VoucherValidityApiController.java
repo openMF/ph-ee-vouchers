@@ -21,10 +21,10 @@ public class VoucherValidityApiController implements VoucherValidityApi {
         try{
         voucherValidityService.getVoucherValidity(serialNumber, voucherNumber, groupCode, callbackURL);
         }catch (Exception e) {
-            ResponseDTO responseDTO = new ResponseDTO(FAILED_RESPONSE_CODE.getValue(), FAILED_RESPONSE_MESSAGE.getValue(), "");
+            ResponseDTO responseDTO = new ResponseDTO(FAILED_RESPONSE.getValue(), FAILED_RESPONSE.getValue(), "");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseDTO);
         }
-        ResponseDTO responseDTO = new ResponseDTO(SUCCESS_RESPONSE_CODE.getValue(), SUCCESS_RESPONSE_MESSAGE.getValue(), "");
+        ResponseDTO responseDTO = new ResponseDTO(SUCCESS_RESPONSE.getValue(), SUCCESS_RESPONSE.getValue(), "");
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(responseDTO);
     }
 }
