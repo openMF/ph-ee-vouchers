@@ -19,7 +19,7 @@ import java.util.concurrent.ExecutionException;
 import static org.mifos.pheevouchermanagementsystem.util.VoucherManagementEnum.*;
 
 @RestController
-public class VoucherLifecycleManagementApiController implements VoucherLifecycleManagementApi {
+public class  VoucherLifecycleManagementApiController implements VoucherLifecycleManagementApi {
     @Autowired
     ActivateVoucherService activateVoucherService;
     @Autowired
@@ -53,11 +53,21 @@ public class VoucherLifecycleManagementApiController implements VoucherLifecycle
                 requestDTO = objectMapper.convertValue(requestBody, RequestDTO.class);
                 voucherLifecycleService.cancelVoucher(requestDTO, callbackURL, registeringInstitutionId);
             }
+            else if(command.equals("redeemPay")){
+                redeemVoucherRequestDTO = objectMapper.convertValue(requestBody, RedeemVoucherRequestDTO.class);
+                redeemVoucherService.redeemAndPay(redeemVoucherRequestDTO, callbackURL, registeringInstitutionId);
+            }
         } catch (Exception e) {
-            ResponseDTO responseDTO = new ResponseDTO(FAILED_RESPONSE.getValue(), FAILED_RESPONSE.getValue(), requestDTO.getRequestID());
+            ResponseDTO responseDTO = new ResponseDTO(FAILED_RESPONSE.getValue(), FAILED_RESPONSE.getMessage(), requestDTO.getRequestID());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body((T) responseDTO);
         }
-        ResponseDTO responseDTO = new ResponseDTO(SUCCESS_RESPONSE.getValue(), SUCCESS_RESPONSE.getValue(), requestDTO.getRequestID());
+        String requestId;
+        if(requestDTO == null){
+            requestId = redeemVoucherRequestDTO.getRequestId();
+        }else {
+            requestId = requestDTO.getRequestID();
+        }
+        ResponseDTO responseDTO = new ResponseDTO(SUCCESS_RESPONSE.getValue(), SUCCESS_RESPONSE.getMessage(), requestId);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body((T) responseDTO);
 
     }

@@ -12,6 +12,6 @@ import java.util.concurrent.ExecutionException;
 
 public interface CreateVoucherApi {
     @PostMapping("/vouchers")
-    ResponseEntity<ResponseDTO> createVouchers(@RequestHeader(value="X-CallbackURL") String callbackURL, @RequestHeader(value = "registeringInstitutionId") String registeringInstitutionId,
+    ResponseEntity<ResponseDTO> createVouchers(@RequestHeader(value="X-CallbackURL") String callbackURL, @RequestHeader(value = "X-Registering-Institution-ID") String registeringInstitutionId,
                                                @RequestBody RequestDTO requestBody) throws ExecutionException, InterruptedException, JsonProcessingException;
 }

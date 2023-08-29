@@ -79,9 +79,9 @@ public class VoucherLifecycleService {
     public void validateAndReactivateVouchers(List<VoucherInstruction> voucherInstructionList, RequestDTO request, List<FailedCaseDTO> failedCaseList, String registeringInstitutionId){
         voucherInstructionList.stream().forEach(voucherInstruction -> {
             String requestID = request.getRequestID();
-            Boolean voucherValidation = validateVoucherForReactivate(voucherInstruction, request);
-            if (voucherValidation) {
-                Voucher voucher = voucherRepository.findBySerialNo(voucherInstruction.getSerialNumber()).orElseThrow(() -> VoucherNotFoundException.voucherNotFound(voucherInstruction.getSerialNumber()));
+            Boolean isValidated = validateVoucherForReactivate(voucherInstruction, request);
+            if (isValidated) {
+                Voucher voucher = fetchVoucher(voucherInstruction);
                 if(validateRegisteringInstitutionId(voucher, registeringInstitutionId)) {
                     changeStatus(voucher, ACTIVE.getValue());                }
                 else {
@@ -99,9 +99,9 @@ public class VoucherLifecycleService {
     {
         voucherInstructionList.stream().forEach(voucherInstruction -> {
             String requestID = request.getRequestID();
-            Boolean voucherValidation = validateVoucherForSuspend(voucherInstruction, request);
-            if (voucherValidation) {
-                Voucher voucher = voucherRepository.findBySerialNo(voucherInstruction.getSerialNumber()).orElseThrow(() -> VoucherNotFoundException.voucherNotFound(voucherInstruction.getSerialNumber()));
+            Boolean isValidated = validateVoucherForSuspend(voucherInstruction, request);
+            if (isValidated) {
+                Voucher voucher = fetchVoucher(voucherInstruction);
                 if(validateRegisteringInstitutionId(voucher, registeringInstitutionId)) {
                     changeStatus(voucher, SUSPENDED.getValue());                }
                 else {
@@ -118,9 +118,9 @@ public class VoucherLifecycleService {
     public void validateAndCancelVouchers(List<VoucherInstruction> voucherInstructionList, RequestDTO request, List<FailedCaseDTO> failedCaseList, String registeringInstitutionId){
         voucherInstructionList.stream().forEach(voucherInstruction -> {
             String requestID = request.getRequestID();
-            Boolean voucherValidation = validateVoucherForCancel(voucherInstruction, request);
-            if (voucherValidation) {
-                Voucher voucher = voucherRepository.findBySerialNo(voucherInstruction.getSerialNumber()).orElseThrow(() -> VoucherNotFoundException.voucherNotFound(voucherInstruction.getSerialNumber()));
+            Boolean isValidated = validateVoucherForCancel(voucherInstruction, request);
+            if (isValidated) {
+                Voucher voucher = fetchVoucher(voucherInstruction);
                 if(validateRegisteringInstitutionId(voucher, registeringInstitutionId)) {
                     changeStatus(voucher, CANCELLED.getValue());                }
                 else {
@@ -136,21 +136,21 @@ public class VoucherLifecycleService {
 
     public Boolean validateVoucherForReactivate(VoucherInstruction voucherInstruction, RequestDTO request){
         if(voucherRepository.existsBySerialNo(voucherInstruction.getSerialNumber())){
-            Voucher voucher = voucherRepository.findBySerialNo(voucherInstruction.getSerialNumber()).orElseThrow(() -> VoucherNotFoundException.voucherNotFound(voucherInstruction.getSerialNumber()));
+            Voucher voucher = fetchVoucher(voucherInstruction);
             return !voucher.getStatus().equals(EXPIRED.getValue()) && !voucher.getStatus().equals(UTILIZED.getValue()) && !voucher.getStatus().equals(CANCELLED.getValue());
         }
         return false;
     }
     public Boolean validateVoucherForCancel(VoucherInstruction voucherInstruction, RequestDTO request){
         if(voucherRepository.existsBySerialNo(voucherInstruction.getSerialNumber())){
-            Voucher voucher = voucherRepository.findBySerialNo(voucherInstruction.getSerialNumber()).orElseThrow(() -> VoucherNotFoundException.voucherNotFound(voucherInstruction.getSerialNumber()));
+            Voucher voucher = fetchVoucher(voucherInstruction);
             return !voucher.getStatus().equals(EXPIRED.getValue()) && !voucher.getStatus().equals(UTILIZED.getValue()) && !voucher.getStatus().equals(CANCELLED.getValue());
         }
         return false;
     }
     public Boolean validateVoucherForSuspend(VoucherInstruction voucherInstruction, RequestDTO request){
         if(voucherRepository.existsBySerialNo(voucherInstruction.getSerialNumber())){
-            Voucher voucher = voucherRepository.findBySerialNo(voucherInstruction.getSerialNumber()).orElseThrow(() -> VoucherNotFoundException.voucherNotFound(voucherInstruction.getSerialNumber()));
+            Voucher voucher = fetchVoucher(voucherInstruction);
             return !voucher.getStatus().equals(EXPIRED.getValue()) && !voucher.getStatus().equals(CANCELLED.getValue()) && !voucher.getStatus().equals(UTILIZED.getValue());
         }
         return false;
@@ -164,5 +164,9 @@ public class VoucherLifecycleService {
         }catch (RuntimeException e){
             logger.error(e.getMessage());
         }
+    }
+
+    public Voucher fetchVoucher(VoucherInstruction voucherInstruction){
+        return voucherRepository.findBySerialNo(voucherInstruction.getSerialNumber()).orElseThrow(() -> VoucherNotFoundException.voucherNotFound(voucherInstruction.getSerialNumber()));
     }
 }
