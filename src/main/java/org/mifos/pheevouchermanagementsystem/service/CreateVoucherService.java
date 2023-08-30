@@ -44,24 +44,24 @@ public class CreateVoucherService {
         this.objectMapper = objectMapper;
     }
     @Async("asyncExecutor")
-    public void createVouchers(RequestDTO request, String callbackURL){
+    public void createVouchers(RequestDTO request, String callbackURL, String registeringInstitutionId){
         List<VoucherInstruction> voucherInstructionList = request.getVoucherInstructions();
         List<ErrorTracking> errorTrackingsList = new ArrayList<>();
         List<SuccessfulVouchers> successfulVouchers = new ArrayList<>();
-        validateAndSaveVoucher(voucherInstructionList, successfulVouchers, errorTrackingsList, request);
+        validateAndSaveVoucher(voucherInstructionList, successfulVouchers, errorTrackingsList, request, registeringInstitutionId);
         try {
             sendCallbackService.sendCallback(objectMapper.writeValueAsString(new CallbackRequestDTO(request.getRequestID(), request.getBatchID(), successfulVouchers)), callbackURL);
         } catch (JsonProcessingException e) {
             logger.error(e.getMessage());
         }
     }
-    public void validateAndSaveVoucher(List<VoucherInstruction> voucherInstructionList, List<SuccessfulVouchers> successfulVouchers ,List<ErrorTracking> errorTrackingList, RequestDTO request){
+    public void validateAndSaveVoucher(List<VoucherInstruction> voucherInstructionList, List<SuccessfulVouchers> successfulVouchers ,List<ErrorTracking> errorTrackingList, RequestDTO request, String registeringInstitutionId){
         try {
             voucherInstructionList.stream().forEach(voucherInstruction -> {
                 String requestID = request.getRequestID();
                 Boolean instructionValidation = validateInstruction(voucherInstruction, request, successfulVouchers);
                 if (!instructionValidation) {
-                    addVouchers(voucherInstruction, successfulVouchers, errorTrackingList, request);
+                    addVouchers(voucherInstruction, successfulVouchers, errorTrackingList, request, registeringInstitutionId);
                 } else {
                     throw new InstructionIdException(voucherInstruction.getInstructionID());
                 }
@@ -76,11 +76,11 @@ public class CreateVoucherService {
     }
 
 @Transactional
-    public void addVouchers(VoucherInstruction voucherInstruction, List<SuccessfulVouchers> successfulVouchers, List<ErrorTracking> errorTrackingList, RequestDTO request){
+    public void addVouchers(VoucherInstruction voucherInstruction, List<SuccessfulVouchers> successfulVouchers, List<ErrorTracking> errorTrackingList, RequestDTO request, String registeringInstitutionId){
         String serialNumber = generateUniqueNumber(14);
         String voucherNumber = generateUniqueNumber(18);
         Voucher voucher =  new Voucher(serialNumber, hashVoucherNumber(voucherNumber),voucherInstruction.getAmount(),voucherInstruction.getCurrency(),voucherInstruction.getGroupCode()
-        ,INACTIVE.getValue(),null,LocalDateTime.now(),null, voucherInstruction.getPayeeFunctionalID(), request.getBatchID(),voucherInstruction.getInstructionID(),request.getRequestID());
+        ,INACTIVE.getValue(),null,LocalDateTime.now(),null, voucherInstruction.getPayeeFunctionalID(), request.getBatchID(),voucherInstruction.getInstructionID(),request.getRequestID(), registeringInstitutionId);
         try {
             voucherRepository.save(voucher);
             successfulVouchers.add(new SuccessfulVouchers(voucherInstruction.getInstructionID(), voucherInstruction.getCurrency(), voucherInstruction.getAmount()

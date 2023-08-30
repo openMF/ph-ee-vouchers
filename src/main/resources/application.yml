@@ -3,19 +3,19 @@ server:
 
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/VoucherManagement
+    url: jdbc:mysql://operationsmysql:3306/voucher_management
     username: root
     password: mysql
     driver-class-name: com.mysql.cj.jdbc.Driver
   liquibase:
     enabled: true
-    default-schema: VoucherManagement
+    default-schema: voucher_management
     change-log: classpath:/db/changelog/changelog.xml
     clear-checksums: true
 
 logging:
   level:
-    ROOT: INFO
+    ROOT: DEBUG
 
 async:
   core_pool_size: 10
@@ -23,3 +23,40 @@ async:
   queue_capacity: 100
 
 expiry_time: 60
+
+salting:
+  enabled: true
+
+identity-account-mapper:
+  hostname : "https://identity-mapper.sandbox.mifos.io/"
+
+zeebe:
+  client:
+    max-execution-threads: 1000
+    evenly-allocated-max-jobs: 1000
+  #    max-execution-threads: 100
+  #    number-of-workers: 15
+  #    evenly-allocated-max-jobs: "#{${zeebe.client.max-execution-threads} / ${zeebe.client.number-of-workers}}"
+  broker:
+    contactpoint: "localhost:26500"
+
+camel:
+  serverPort: 5050
+  disable-ssl: false
+  springboot:
+    main-run-controller: true
+    dataformat:
+      json-jackson:
+        auto-discover-object-mapper: true
+
+payer:
+  tenant: rhino
+  identifier: 12345678
+  identifierType: MSISDN
+
+voucher:
+  hostname: "https://vouchers.sandbox.mifos.io"
+operations:
+  hostname: "https://ops-bk.sandbox.mifos.io"
+  endpoints:
+    transfers: "/api/v1/transfers?size=1&page=0"

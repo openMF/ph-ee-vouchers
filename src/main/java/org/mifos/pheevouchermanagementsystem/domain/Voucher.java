@@ -51,9 +51,11 @@ public class Voucher {
 
     @Column(name = "request_id", nullable = false)
     private String requestId;
+    @Column(name = "registering_institution_id", nullable = false)
+    private String registeringInstitutionId;
 
     public Voucher(String serialNo, String voucherNo, BigDecimal amount, String currency, String groupCode, String status, Date expiryDate,
-                   LocalDateTime createdDate, LocalDateTime activatedDate, String payeeFunctionalId, String batchId, String instructionId, String requestId) {
+                   LocalDateTime createdDate, LocalDateTime activatedDate, String payeeFunctionalId, String batchId, String instructionId, String requestId, String registeringInstitutionId) {
         this.serialNo = serialNo;
         this.voucherNo = voucherNo;
         this.amount = amount;
@@ -67,6 +69,7 @@ public class Voucher {
         this.batchId = batchId;
         this.instructionId = instructionId;
         this.requestId = requestId;
+        this.registeringInstitutionId = registeringInstitutionId;
     }
     public Voucher(){
 
@@ -182,5 +185,13 @@ public class Voucher {
 
     public void setRequestId(String requestId) {
         this.requestId = requestId;
+    }
+
+    public String getRegisteringInstitutionId() {
+        return registeringInstitutionId;
+    }
+
+    public void setRegisteringInstitutionId(String registeringInstitutionId) {
+        this.registeringInstitutionId = registeringInstitutionId;
     }
 }

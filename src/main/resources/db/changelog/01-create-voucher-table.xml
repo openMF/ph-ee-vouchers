@@ -3,7 +3,7 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.5.xsd">
 
-<changeSet id="createVoucherTable" author="vouchers">
+<changeSet id="createVoucherTable" author="voucher_management">
     <createTable tableName="vouchers">
         <column name="id" type="BIGINT" autoIncrement="true">
             <constraints primaryKey="true" nullable="false"/>
@@ -21,6 +21,7 @@
         <column name="batch_id" type="VARCHAR(255)"/>
         <column name="instruction_id" type="VARCHAR(255)"/>
         <column name="request_id" type="VARCHAR(255)"/>
+        <column name="registering_institution_id" type="VARCHAR(255)"/>
     </createTable>
 </changeSet>
 </databaseChangeLog>

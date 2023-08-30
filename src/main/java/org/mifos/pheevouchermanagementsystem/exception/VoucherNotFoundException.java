@@ -8,7 +8,7 @@ public class VoucherNotFoundException extends RuntimeException{
     }
 
     public static InstructionIdException voucherNotFound(final String voucherSerialNo) {
-        String stringWithPlaceHolder = "Voucher with serial number {0} already exist!";
+        String stringWithPlaceHolder = "Voucher with serial/voucher number {0} not found!";
         return new InstructionIdException(MessageFormat.format(stringWithPlaceHolder,voucherSerialNo));
     }
 }

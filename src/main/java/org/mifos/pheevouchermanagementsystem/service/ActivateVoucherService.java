@@ -17,10 +17,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mifos.pheevouchermanagementsystem.util.VoucherStatusEnum.ACTIVE;
+import static org.mifos.pheevouchermanagementsystem.util.VoucherStatusEnum.*;
+import static org.mifos.pheevouchermanagementsystem.util.VoucherStatusEnum.CANCELLED;
 
 @Service
 public class ActivateVoucherService {
@@ -42,10 +44,10 @@ public class ActivateVoucherService {
         this.objectMapper = objectMapper;
     }
     @Async("asyncExecutor")
-    public void activateVouchers(RequestDTO request, String callbackURL){
+    public void activateVouchers(RequestDTO request, String callbackURL, String registeringInstitutionId){
         List<VoucherInstruction> voucherInstructionList = request.getVoucherInstructions();
         List<FailedCaseDTO> failedCaseList = new ArrayList<>();
-        validateVouchers(voucherInstructionList, request, failedCaseList);
+        validateVouchers(voucherInstructionList, request, failedCaseList, registeringInstitutionId);
         try {
             sendCallbackService.sendCallback(objectMapper.writeValueAsString(new VoucherLifecycleCallbackResponseDTO(UniqueIDGenerator.generateUniqueNumber(12), request.getRequestID(), failedCaseList.size(), failedCaseList)), callbackURL);
         } catch (JsonProcessingException e) {
@@ -54,12 +56,19 @@ public class ActivateVoucherService {
 
     }
 
-    public void validateVouchers(List<VoucherInstruction> voucherInstructionList, RequestDTO request, List<FailedCaseDTO> failedCaseList){
+    public void validateVouchers(List<VoucherInstruction> voucherInstructionList, RequestDTO request, List<FailedCaseDTO> failedCaseList, String registeringInstitutionId){
         voucherInstructionList.stream().forEach(voucherInstruction -> {
             String requestID = request.getRequestID();
             Boolean voucherValidation = validateVoucher(voucherInstruction, request);
             if (voucherValidation) {
-                activateVouchers(voucherInstruction, failedCaseList, request);
+                Voucher voucher = voucherRepository.findBySerialNo(voucherInstruction.getSerialNumber()).orElseThrow(() -> VoucherNotFoundException.voucherNotFound(voucherInstruction.getSerialNumber()));
+                if(validateRegisteringInstitutionId(voucher, registeringInstitutionId)) {
+                    activateVouchers(voucherInstruction, failedCaseList, request);
+                }
+                else {
+                    FailedCaseDTO failedCase =   new FailedCaseDTO(voucherInstruction.getSerialNumber(), "The voucher provided in the request does not correspond to the same registering ID.");
+                    failedCaseList.add(failedCase);
+                }
             } else {
                 FailedCaseDTO failedCase =   new FailedCaseDTO(voucherInstruction.getSerialNumber(), "Voucher with serial number does not exist.");
                 failedCaseList.add(failedCase);
@@ -68,7 +77,11 @@ public class ActivateVoucherService {
     }
 
     public Boolean validateVoucher(VoucherInstruction voucherInstruction, RequestDTO request){
-        return voucherRepository.existsBySerialNo(voucherInstruction.getSerialNumber());
+        if(voucherRepository.existsBySerialNo(voucherInstruction.getSerialNumber())){
+            Voucher voucher = voucherRepository.findBySerialNo(voucherInstruction.getSerialNumber()).orElseThrow(() -> VoucherNotFoundException.voucherNotFound(voucherInstruction.getSerialNumber()));
+            return !voucher.getStatus().equals(EXPIRED.getValue()) && !voucher.getStatus().equals(UTILIZED.getValue()) && !voucher.getStatus().equals(CANCELLED.getValue());
+        }
+        return false;
     }
 
     @Transactional
@@ -77,8 +90,8 @@ public class ActivateVoucherService {
             Voucher voucher = voucherRepository.findBySerialNo(voucherInstruction.getSerialNumber()).orElseThrow(() -> VoucherNotFoundException.voucherNotFound(voucherInstruction.getSerialNumber()));
             if(validateVoucherStatus(voucher, failedCaseList)) {
                 voucher.setStatus(ACTIVE.getValue());
-                LocalDate currentDate = LocalDate.now();
-                LocalDate updatedDate = currentDate.plusDays(expiryTime);
+                LocalDate updatedDate = LocalDate.now().plusDays(expiryTime);
+                voucher.setActivatedDate(LocalDateTime.now());
                 voucher.setExpiryDate(java.sql.Date.valueOf(updatedDate));
                 voucherRepository.save(voucher);
             }
@@ -92,5 +105,8 @@ public class ActivateVoucherService {
             return false;
         }
         return true;
+    }
+    public static Boolean validateRegisteringInstitutionId(Voucher voucher, String registeringInstitutionId){
+        return voucher.getRegisteringInstitutionId().equals(registeringInstitutionId);
     }
 }
