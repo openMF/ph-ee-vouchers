@@ -29,7 +29,7 @@ public class  VoucherLifecycleManagementApiController implements VoucherLifecycl
     @Autowired
     VoucherLifecycleService voucherLifecycleService;
     @Override
-    public <T> ResponseEntity<T> voucherStatusChange(String callbackURL, String registeringInstitutionId, Object requestBody, String command) throws ExecutionException, InterruptedException, JsonProcessingException {
+    public <T> ResponseEntity<T> voucherStatusChange(String callbackURL, String programId, String registeringInstitutionId, Object requestBody, String command) throws ExecutionException, InterruptedException, JsonProcessingException {
         RequestDTO requestDTO = null;
         RedeemVoucherRequestDTO redeemVoucherRequestDTO = null;
         try {
