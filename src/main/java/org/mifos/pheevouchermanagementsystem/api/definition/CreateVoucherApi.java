@@ -16,6 +16,8 @@ public interface CreateVoucherApi {
     @Operation(
             summary = "Create Vouchers API")
     @PostMapping("/vouchers")
-    ResponseEntity<ResponseDTO> createVouchers(@RequestHeader(value="X-CallbackURL") String callbackURL, @RequestHeader(value = "X-Registering-Institution-ID") String registeringInstitutionId,
+    ResponseEntity<ResponseDTO> createVouchers(@RequestHeader(value="X-CallbackURL") String callbackURL,
+                                               @RequestHeader(value =  "X-Program-ID") String programId,
+                                               @RequestHeader(value = "X-Registering-Institution-ID") String registeringInstitutionId,
                                                @RequestBody RequestDTO requestBody) throws ExecutionException, InterruptedException, JsonProcessingException;
 }
