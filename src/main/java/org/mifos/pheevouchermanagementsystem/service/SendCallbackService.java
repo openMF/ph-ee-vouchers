@@ -19,13 +19,14 @@ public class SendCallbackService {
     private static final Logger logger = LoggerFactory.getLogger(SendCallbackService.class);
 
     public void sendCallback(String body, String callbackURL){
+        logger.debug(body);
+        logger.debug(callbackURL);
         Response response = RestAssured.given()
                 .baseUri(callbackURL)
                 .header("Content-Type", ContentType.JSON)
                 .body(body)
                 .when()
                 .put();
-        logger.info(callbackURL);
         String responseBody = response.getBody().asString();
         logger.info(responseBody);
         int responseCode = response.getStatusCode();
