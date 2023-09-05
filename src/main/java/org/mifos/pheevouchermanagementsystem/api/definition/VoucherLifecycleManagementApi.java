@@ -16,7 +16,7 @@ public interface VoucherLifecycleManagementApi {
     @PutMapping("/vouchers")
     <T> ResponseEntity<T> voucherStatusChange(@RequestHeader(value="X-CallbackURL") String callbackURL,
                                               @RequestHeader(value = "X-Registering-Institution-ID") String registeringInstitutionId,
-                                              @RequestHeader(value =  "X-Program-ID") String programId,
+                                              @RequestHeader(value =  "X-Program-ID", required = false) String programId,
                                               @RequestBody Object requestBody,
                                               @RequestParam(value = "command") String command) throws ExecutionException, InterruptedException, JsonProcessingException, JsonProcessingException;
 }
