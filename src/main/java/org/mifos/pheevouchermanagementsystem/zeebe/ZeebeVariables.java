@@ -1,7 +1,9 @@
 package org.mifos.pheevouchermanagementsystem.zeebe;
 
-public class ZeebeVariables {
+public final class ZeebeVariables {
+
     private ZeebeVariables() {}
+
     public static final String ACCOUNT_LOOKUP_FAILED = "accountLookupFailed";
     public static final String ORIGIN_CHANNEL_REQUEST = "originChannelRequest";
     public static final String CALLBACK = "X-CallbackURL";
@@ -14,6 +16,5 @@ public class ZeebeVariables {
     public static final String PAYER_IDENTIFIER_TYPE = "payerIdentifierType";
     public static final String REQUEST_ID = "requestId";
     public static final String PAYEE_IDENTITY = "payeeIdentity";
-
 
 }

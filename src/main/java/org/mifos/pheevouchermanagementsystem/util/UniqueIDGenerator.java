@@ -2,7 +2,10 @@ package org.mifos.pheevouchermanagementsystem.util;
 
 import java.util.Random;
 
-public class UniqueIDGenerator {
+public final class UniqueIDGenerator {
+
+    private UniqueIDGenerator() {}
+
     public static String generateUniqueNumber(int length) {
         Random rand = new Random();
         long timestamp = System.currentTimeMillis();

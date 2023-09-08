@@ -1,11 +1,14 @@
 package org.mifos.pheevouchermanagementsystem.util;
 
-
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import lombok.extern.slf4j.Slf4j;
 
-public class EncryptVoucher {
+@Slf4j
+public final class EncryptVoucher {
+
+    private EncryptVoucher() {}
 
     public static String hashVoucherNumberSalting(String serialNumber, String voucherNumber) {
         // Concatenate the serialNumber and voucherNumber
@@ -18,7 +21,7 @@ public class EncryptVoucher {
         return hash(voucherNumber);
     }
 
-    public static String hash(String value){
+    public static String hash(String value) {
         try {
             // Create a MessageDigest instance with SHA algorithm
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -41,11 +44,10 @@ public class EncryptVoucher {
 
             return hexString.toString();
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            log.debug(e.getLocalizedMessage());
         }
 
         return null;
     }
-
 
 }

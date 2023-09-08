@@ -1,11 +1,15 @@
 package org.mifos.pheevouchermanagementsystem.zeebe.worker;
 
+import static org.mifos.pheevouchermanagementsystem.util.VoucherStatusEnum.ACTIVE;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.camunda.zeebe.client.ZeebeClient;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.specification.RequestSpecification;
+import java.util.Map;
+import javax.annotation.PostConstruct;
 import org.apache.camel.CamelContext;
 import org.apache.camel.ProducerTemplate;
 import org.json.JSONArray;
@@ -19,13 +23,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import java.util.Map;
-
-import static org.mifos.pheevouchermanagementsystem.util.VoucherStatusEnum.ACTIVE;
-
 @Component
 public class CheckTransferStatusWorker {
+
     @Autowired
     private ZeebeClient zeebeClient;
 
@@ -59,10 +59,8 @@ public class CheckTransferStatusWorker {
             requestSpec.queryParam("clientCorrelationId", "\"" + existingVariables.get("clientCorrelationId").toString() + "\"");
             requestSpec.queryParam("size", "1");
 
-
             String response = RestAssured.given(requestSpec).baseUri(operationHostname).expect()
-                    .spec(new ResponseSpecBuilder().expectStatusCode(200).build()).when().get(transfersEndpoint)
-                    .andReturn().asString();
+                    .spec(new ResponseSpecBuilder().expectStatusCode(200).build()).when().get(transfersEndpoint).andReturn().asString();
 
             JSONObject responseJson = new JSONObject(response);
             String status = null;
@@ -75,10 +73,12 @@ public class CheckTransferStatusWorker {
                     }
                 }
             }
-            if(status != null) {
+            if (status != null) {
                 if (!status.equals("COMPLETED")) {
                     try {
-                        Voucher voucher = voucherRepository.findBySerialNo(existingVariables.get("voucherSerialNumber").toString()).orElseThrow(() -> VoucherNotFoundException.voucherNotFound(existingVariables.get("voucherSerialNumber").toString()));
+                        Voucher voucher = voucherRepository.findBySerialNo(existingVariables.get("voucherSerialNumber").toString())
+                                .orElseThrow(() -> VoucherNotFoundException
+                                        .voucherNotFound(existingVariables.get("voucherSerialNumber").toString()));
                         voucher.setStatus(ACTIVE.getValue());
                         voucherRepository.save(voucher);
                     } catch (RuntimeException e) {

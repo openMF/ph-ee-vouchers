@@ -1,19 +1,24 @@
 package org.mifos.pheevouchermanagementsystem.domain;
 
-
-import javax.persistence.*;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDateTime;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "vouchers")
 public class Voucher {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "serial_no",unique = true)
+    @Column(name = "serial_no", unique = true)
     private String serialNo;
 
     @Column(name = "voucher_no", unique = true)
@@ -55,7 +60,8 @@ public class Voucher {
     private String registeringInstitutionId;
 
     public Voucher(String serialNo, String voucherNo, BigDecimal amount, String currency, String groupCode, String status, Date expiryDate,
-                   LocalDateTime createdDate, LocalDateTime activatedDate, String payeeFunctionalId, String batchId, String instructionId, String requestId, String registeringInstitutionId) {
+            LocalDateTime createdDate, LocalDateTime activatedDate, String payeeFunctionalId, String batchId, String instructionId,
+            String requestId, String registeringInstitutionId) {
         this.serialNo = serialNo;
         this.voucherNo = voucherNo;
         this.amount = amount;
@@ -71,7 +77,8 @@ public class Voucher {
         this.requestId = requestId;
         this.registeringInstitutionId = registeringInstitutionId;
     }
-    public Voucher(){
+
+    public Voucher() {
 
     }
 
