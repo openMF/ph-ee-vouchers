@@ -1,9 +1,9 @@
 package org.mifos.pheevouchermanagementsystem.util;
 
 public enum PaymentModalityEnum {
-    ACCOUNT_ID("0"),
-    MSISDN("1"),
-    VOUCHER("2");
+
+    ACCOUNT_ID("0"), MSISDN("1"), VOUCHER("2");
+
     private final String value;
 
     PaymentModalityEnum(String value) {
@@ -18,6 +18,7 @@ public enum PaymentModalityEnum {
         }
         return null;
     }
+
     public static String getKeyByValue(String value) {
         for (PaymentModalityEnum pair : values()) {
             if (pair.getValue().equalsIgnoreCase(value)) {
@@ -26,7 +27,6 @@ public enum PaymentModalityEnum {
         }
         return null;
     }
-
 
     public String getValue() {
         return this.value;

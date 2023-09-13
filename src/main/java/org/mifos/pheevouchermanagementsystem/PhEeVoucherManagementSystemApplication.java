@@ -8,10 +8,12 @@ import org.springframework.context.annotation.ComponentScan;
 @EnableCaching
 @SpringBootApplication
 @ComponentScan("org.mifos.pheevouchermanagementsystem")
-public class PhEeVoucherManagementSystemApplication {
+public final class PhEeVoucherManagementSystemApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(PhEeVoucherManagementSystemApplication.class, args);
-	}
+    private PhEeVoucherManagementSystemApplication() {}
+
+    public static void main(String[] args) {
+        SpringApplication.run(PhEeVoucherManagementSystemApplication.class, args);
+    }
 
 }

@@ -2,24 +2,24 @@ package org.mifos.pheevouchermanagementsystem.zeebe;
 
 import io.camunda.zeebe.client.ZeebeClient;
 import io.camunda.zeebe.client.api.response.ProcessInstanceEvent;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import org.mifos.connector.common.zeebe.ZeebeVariables;
-import org.mifos.pheevouchermanagementsystem.service.RedeemVoucherService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
 @Component
 public class ZeebeProcessStarter {
+
     private static final Logger logger = LoggerFactory.getLogger(ZeebeProcessStarter.class);
 
     @Autowired
     private ZeebeClient zeebeClient;
+
     public String startZeebeWorkflow(String workflowId, String request, Map<String, Object> extraVariables) {
         String transactionId = generateTransactionId();
 
@@ -40,6 +40,7 @@ public class ZeebeProcessStarter {
                 instance.getProcessInstanceKey());
         return transactionId;
     }
+
     private String generateTransactionId() {
         return UUID.randomUUID().toString();
     }
