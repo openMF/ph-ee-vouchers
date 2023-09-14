@@ -55,8 +55,13 @@ payer:
   identifierType: MSISDN
 
 voucher:
-  hostname: "https://vouchers.sandbox.mifos.io"
+  hostname: "https://vouchers.sandbox.fynarfin.io"
 operations:
   hostname: "https://ops-bk.sandbox.mifos.io"
   endpoints:
     transfers: "/api/v1/transfers?size=1&page=0"
+
+mock_schema:
+  hostname: "http://mockpaymentschema.sandbox.fynarfin.io"
+  endpoints:
+    batch_auth: "/batches/"

@@ -1,7 +1,6 @@
 package org.mifos.pheevouchermanagementsystem.api.implementation;
 
-import static org.mifos.pheevouchermanagementsystem.util.VoucherManagementEnum.FAILED_RESPONSE;
-import static org.mifos.pheevouchermanagementsystem.util.VoucherManagementEnum.SUCCESS_RESPONSE;
+import static org.mifos.pheevouchermanagementsystem.util.VoucherManagementEnum.*;
 
 import java.util.concurrent.ExecutionException;
 import org.mifos.pheevouchermanagementsystem.api.definition.VoucherValidityApi;
@@ -24,10 +23,10 @@ public class VoucherValidityApiController implements VoucherValidityApi {
         try {
             voucherValidityService.getVoucherValidity(serialNumber, voucherNumber, groupCode, callbackURL);
         } catch (Exception e) {
-            ResponseDTO responseDTO = new ResponseDTO(FAILED_RESPONSE.getValue(), FAILED_RESPONSE.getValue(), "");
+            ResponseDTO responseDTO = new ResponseDTO(FAILED_RESPONSE.getValue(), FAILED_RESPONSE.getMessage(), "");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseDTO);
         }
-        ResponseDTO responseDTO = new ResponseDTO(SUCCESS_RESPONSE.getValue(), SUCCESS_RESPONSE.getValue(), "");
+        ResponseDTO responseDTO = new ResponseDTO(SUCCESS_RESPONSE.getValue(), SUCCESS_RESPONSE.getMessage(), "");
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(responseDTO);
     }
 }
