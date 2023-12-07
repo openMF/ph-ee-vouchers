@@ -1,6 +1,5 @@
 package org.mifos.pheevouchermanagementsystem.service;
 
-import static org.mifos.pheevouchermanagementsystem.util.EncryptVoucher.hashVoucherNumber;
 import static org.mifos.pheevouchermanagementsystem.util.UniqueIDGenerator.generateUniqueNumber;
 import static org.mifos.pheevouchermanagementsystem.util.VoucherStatusEnum.INACTIVE;
 
@@ -18,6 +17,8 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.transaction.Transactional;
+
+import org.mifos.connector.common.util.SecurityUtil;
 import org.mifos.pheevouchermanagementsystem.data.RequestDTO;
 import org.mifos.pheevouchermanagementsystem.data.SuccessfulVouchers;
 import org.mifos.pheevouchermanagementsystem.data.VoucherInstruction;
@@ -117,7 +118,7 @@ public class CreateVoucherService {
             List<ErrorTracking> errorTrackingList, String registeringInstitutionId, String batchId, String requestId) {
         String serialNumber = generateUniqueNumber(14);
         String voucherNumber = generateUniqueNumber(18);
-        Voucher voucher = new Voucher(serialNumber, hashVoucherNumber(voucherNumber), voucherInstruction.getAmount(),
+        Voucher voucher = new Voucher(serialNumber, SecurityUtil.hash(voucherNumber), voucherInstruction.getAmount(),
                 voucherInstruction.getCurrency(), voucherInstruction.getGroupCode(), INACTIVE.getValue(), null, LocalDateTime.now(), null,
                 voucherInstruction.getPayeeFunctionalID(), batchId, voucherInstruction.getInstructionID(), requestId,
                 registeringInstitutionId);

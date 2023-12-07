@@ -24,9 +24,9 @@ public class EncryptionService {
         return SecurityUtil.encryptUsingPrivateKey(data, privateKey);
     }
 
-    public String decrypt(String decryptedData) throws NoSuchPaddingException, IllegalBlockSizeException,
+    public String decrypt(String encryptedData) throws NoSuchPaddingException, IllegalBlockSizeException,
             NoSuchAlgorithmException, BadPaddingException, InvalidKeySpecException, InvalidKeyException {
-        return SecurityUtil.decryptUsingPublicKey(decryptedData, publicKey);
+        return SecurityUtil.decryptUsingPublicKey(encryptedData, publicKey);
     }
 
 }
