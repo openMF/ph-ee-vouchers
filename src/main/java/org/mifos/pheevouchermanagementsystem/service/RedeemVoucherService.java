@@ -7,7 +7,6 @@ import static org.mifos.pheevouchermanagementsystem.util.VoucherStatusEnum.ACTIV
 import static org.mifos.pheevouchermanagementsystem.util.VoucherStatusEnum.UTILIZED;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -16,7 +15,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
-
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import org.mifos.connector.common.util.SecurityUtil;
 import org.mifos.pheevouchermanagementsystem.data.RedeemVoucherRequestDTO;
 import org.mifos.pheevouchermanagementsystem.data.RedeemVoucherResponseDTO;
@@ -29,10 +30,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 
 @Service
 public class RedeemVoucherService {
@@ -58,9 +55,8 @@ public class RedeemVoucherService {
         try {
             // find voucher by voucher no / secret code
             /*
-            String encryptedVoucher = "this is hidden voucher";
-            String voucherNum = decrypt(encryptedVoucher, publicKey)
-            find in db: findBy(hash(voucherNum))
+             * String encryptedVoucher = "this is hidden voucher"; String voucherNum = decrypt(encryptedVoucher,
+             * publicKey) find in db: findBy(hash(voucherNum))
              */
             String voucherNumber = encryptionService.decrypt(redeemVoucherRequestDTO.getVoucherSecretNumber());
             voucher = voucherRepository.findByVoucherNo(SecurityUtil.hash(voucherNumber))
@@ -83,11 +79,12 @@ public class RedeemVoucherService {
             return new RedeemVoucherResponseDTO(FAILURE.getValue(), "Voucher Not Found!", redeemVoucherRequestDTO.getVoucherSecretNumber(),
                     "", LocalDateTime.now(ZoneId.systemDefault()).toString(), transactionId); // sendCallbackService.sendCallback("Requested
                                                                                               // resource not found!");
-        } catch (NoSuchPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException |
-                 BadPaddingException | InvalidKeySpecException | InvalidKeyException e) {
+        } catch (NoSuchPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException | BadPaddingException
+                | InvalidKeySpecException | InvalidKeyException e) {
             logger.error(e.getMessage());
-            return new RedeemVoucherResponseDTO(FAILURE.getValue(), "Voucher number invalid!", redeemVoucherRequestDTO.getVoucherSecretNumber(),
-                    "", LocalDateTime.now(ZoneId.systemDefault()).toString(), transactionId);
+            return new RedeemVoucherResponseDTO(FAILURE.getValue(), "Voucher number invalid!",
+                    redeemVoucherRequestDTO.getVoucherSecretNumber(), "", LocalDateTime.now(ZoneId.systemDefault()).toString(),
+                    transactionId);
         }
         return new RedeemVoucherResponseDTO(SUCCESS.getValue(), "Voucher redemption successful!",
                 redeemVoucherRequestDTO.getVoucherSecretNumber(), voucher.getAmount().toString(),
@@ -118,8 +115,8 @@ public class RedeemVoucherService {
             extraVariables.put("currency", voucher.getCurrency());
             extraVariables.put("voucherSerialNumber", redeemVoucherRequestDTO.getVoucherSecretNumber());
             zeebeProcessStarter.startZeebeWorkflow("redeem_and_pay_voucher", null, extraVariables);
-        } catch (RuntimeException | NoSuchPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException |
-                 BadPaddingException | InvalidKeySpecException | InvalidKeyException e) {
+        } catch (RuntimeException | NoSuchPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException | BadPaddingException
+                | InvalidKeySpecException | InvalidKeyException e) {
             logger.error(e.getMessage());
         }
     }

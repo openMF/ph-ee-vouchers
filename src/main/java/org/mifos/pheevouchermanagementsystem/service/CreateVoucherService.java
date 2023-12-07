@@ -17,7 +17,6 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.transaction.Transactional;
-
 import org.mifos.connector.common.util.SecurityUtil;
 import org.mifos.pheevouchermanagementsystem.data.RequestDTO;
 import org.mifos.pheevouchermanagementsystem.data.SuccessfulVouchers;
@@ -125,9 +124,10 @@ public class CreateVoucherService {
         try {
             voucherRepository.save(voucher);
             successfulVouchers.add(new SuccessfulVouchers(voucherInstruction.getInstructionID(), voucherInstruction.getCurrency(),
-                    voucherInstruction.getAmount(), voucherInstruction.getNarration(), encryptionService.encrypt(voucherNumber), serialNumber));
-        } catch (RuntimeException | NoSuchPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException |
-                 BadPaddingException | InvalidKeySpecException | InvalidKeyException exception) {
+                    voucherInstruction.getAmount(), voucherInstruction.getNarration(), encryptionService.encrypt(voucherNumber),
+                    serialNumber));
+        } catch (RuntimeException | NoSuchPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException | BadPaddingException
+                | InvalidKeySpecException | InvalidKeyException exception) {
             ErrorTracking error = new ErrorTracking(requestId, voucherInstruction.getInstructionID(), exception.getMessage());
             errorTrackingList.add(error);
             try {
