@@ -30,6 +30,13 @@ public class VoucherValidator {
     private static final int expectedPayeeFunctionalIDLength = 20;
     private static final String narration = "narration";
     private static final int maximumNarrationLength = 50;
+    private static final String serialNumber = "serialNumber";
+    private static final int expectedSerialNumberLength = 6;
+    private static final String agentID = "serialNumber";
+    private static final int expectedAgentIDLength = 10;
+    private static final String voucherSerialNumber = "voucherSerialNumber";
+    private static final String voucherSecretNumber = "voucherSecretNumber";
+    private static final int expectedVoucherSecretNumberLength = 6;
 
     public PhErrorDTO validateCreateVoucher(RequestDTO request) {
         final ValidatorBuilder validatorBuilder = new ValidatorBuilder();
@@ -93,6 +100,86 @@ public class VoucherValidator {
                     .errorDescription(VoucherValidatorsEnum.VOUCHER_SCHEMA_VALIDATION_ERROR.getMessage())
                     .developerMessage(VoucherValidatorsEnum.VOUCHER_SCHEMA_VALIDATION_ERROR.getMessage())
                     .defaultUserMessage(VoucherValidatorsEnum.VOUCHER_SCHEMA_VALIDATION_ERROR.getMessage());
+
+            PhErrorDTO.PhErrorDTOBuilder phErrorDTOBuilder = new PhErrorDTO.PhErrorDTOBuilder(ExtValidationError.getErrorCode());
+            phErrorDTOBuilder.fromValidatorBuilder(validatorBuilder);
+            return phErrorDTOBuilder.build();
+        }
+
+        return null;
+    }
+
+    public PhErrorDTO validateVoucherLifecycle(RequestDTO request) {
+        final ValidatorBuilder validatorBuilder = new ValidatorBuilder();
+        // Checks for requestID
+        validatorBuilder.reset().resource(resource).parameter(requestId).value(request.getRequestID())
+                .validateFieldNotBlankAndLengthWithFailureCodeAndErrorParams(expectedRequestIdLength,
+                        VoucherValidatorsEnum.INVALID_REQUEST_ID_LENGTH);
+
+        // Checks for batchID
+        validatorBuilder.reset().resource(resource).parameter(batchId).value(request.getBatchID())
+                .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_BATCH_ID).validateFieldNotBlankAndLengthWithFailureCodeAndErrorParams(
+                        expectedBatchIdLength, VoucherValidatorsEnum.INVALID_BATCH_ID_LENGTH);
+
+        // Check for voucherInstructions
+        validatorBuilder.reset().resource(resource).parameter(voucherInstructions).value(request.getVoucherInstructions())
+                .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_VOUCHER_INSTRUCTIONS);
+
+        request.getVoucherInstructions().forEach(voucherInstruction -> {
+            // Check for serialNumber
+            validatorBuilder.reset().resource(resource).parameter(serialNumber).value(voucherInstruction.getSerialNumber())
+                    .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_SERIAL_NUMBER)
+                    .validateFieldNotBlankAndLengthWithFailureCodeAndErrorParams(expectedSerialNumberLength,
+                            VoucherValidatorsEnum.INVALID_SERIAL_NUMBER_LENGTH);
+
+            // Check for status
+            // validatorBuilder.reset().resource(resource).parameter("status").value(voucherInstruction.getStatus())
+            // .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_STATUS);
+        });
+
+        // If errors exist, build and return PhErrorDTO
+        if (validatorBuilder.hasError()) {
+            validatorBuilder.errorCategory(PaymentHubErrorCategory.Validation.toString())
+                    .errorCode(VoucherValidatorsEnum.VOUCHER_LIFECYCLE_VALIDATION_ERROR.getCode())
+                    .errorDescription(VoucherValidatorsEnum.VOUCHER_LIFECYCLE_VALIDATION_ERROR.getMessage())
+                    .developerMessage(VoucherValidatorsEnum.VOUCHER_LIFECYCLE_VALIDATION_ERROR.getMessage())
+                    .defaultUserMessage(VoucherValidatorsEnum.VOUCHER_LIFECYCLE_VALIDATION_ERROR.getMessage());
+
+            PhErrorDTO.PhErrorDTOBuilder phErrorDTOBuilder = new PhErrorDTO.PhErrorDTOBuilder(ExtValidationError.getErrorCode());
+            phErrorDTOBuilder.fromValidatorBuilder(validatorBuilder);
+            return phErrorDTOBuilder.build();
+        }
+
+        return null;
+    }
+
+    public PhErrorDTO validateRedeemVoucher(RedeemVoucherRequestDTO request) {
+        final ValidatorBuilder validatorBuilder = new ValidatorBuilder();
+
+        // Check for requestID
+        validatorBuilder.reset().resource(resource).parameter(requestId).value(request.getRequestId())
+                .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_REQUEST_ID)
+                .validateFieldNotBlankAndLengthWithFailureCodeAndErrorParams(expectedRequestIdLength,
+                        VoucherValidatorsEnum.INVALID_REQUEST_ID_LENGTH);
+
+        // Check for agentID
+        validatorBuilder.reset().resource(resource).parameter(agentID).value(request.getAgentId())
+                .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_AGENT_ID).validateFieldNotBlankAndLengthWithFailureCodeAndErrorParams(
+                        expectedAgentIDLength, VoucherValidatorsEnum.INVALID_AGENT_ID_LENGTH);
+
+        // Check for voucherSecretNumber
+        validatorBuilder.reset().resource(resource).parameter(voucherSecretNumber).value(request.getVoucherSecretNumber())
+                .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_VOUCHER_SECRET_NUMBER)
+                .validateFieldNotBlankAndLengthWithFailureCodeAndErrorParams(expectedVoucherSecretNumberLength,
+                        VoucherValidatorsEnum.INVALID_VOUCHER_SECRET_NUMBER_LENGTH);
+
+        // If errors exist, build and return PhErrorDTO
+        if (validatorBuilder.hasError()) {
+            validatorBuilder.errorCategory(PaymentHubErrorCategory.Validation.toString())
+                    .errorCode(VoucherValidatorsEnum.REDEEM_VOUCHER_VALIDATION_ERROR.getCode())
+                    .errorDescription(VoucherValidatorsEnum.REDEEM_VOUCHER_VALIDATION_ERROR.getMessage())
+                    .developerMessage(VoucherValidatorsEnum.REDEEM_VOUCHER_VALIDATION_ERROR.getMessage())
+                    .defaultUserMessage(VoucherValidatorsEnum.REDEEM_VOUCHER_VALIDATION_ERROR.getMessage());
 
             PhErrorDTO.PhErrorDTOBuilder phErrorDTOBuilder = new PhErrorDTO.PhErrorDTOBuilder(ExtValidationError.getErrorCode());
             phErrorDTOBuilder.fromValidatorBuilder(validatorBuilder);
