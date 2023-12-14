@@ -54,7 +54,9 @@ public class CreateVoucherService {
 
     public PhErrorDTO validateAndCreateVoucher(RequestDTO request, String callbackURL, String registeringInstitutionId) {
         PhErrorDTO phErrorDTO = voucherValidator.validateCreateVoucher(request);
-        if (phErrorDTO == null) createVouchers(request, callbackURL, registeringInstitutionId);
+        if (phErrorDTO == null) {
+            createVouchers(request, callbackURL, registeringInstitutionId);
+        }
 
         return phErrorDTO;
     }
