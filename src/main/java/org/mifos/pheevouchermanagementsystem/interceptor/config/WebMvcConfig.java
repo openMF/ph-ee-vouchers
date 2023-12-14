@@ -10,6 +10,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Component
 @Primary
 public class WebMvcConfig implements WebMvcConfigurer {
+
     @Autowired
     ValidatorInterceptor validatorInterceptor;
 

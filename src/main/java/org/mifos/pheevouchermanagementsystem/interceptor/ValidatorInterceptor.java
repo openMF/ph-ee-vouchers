@@ -1,6 +1,11 @@
 package org.mifos.pheevouchermanagementsystem.interceptor;
 
+import static org.mifos.connector.common.exception.PaymentHubError.ExtValidationError;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.mifos.connector.common.channel.dto.PhErrorDTO;
 import org.mifos.connector.common.exception.PaymentHubErrorCategory;
@@ -12,19 +17,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-
-import static org.mifos.connector.common.exception.PaymentHubError.ExtValidationError;
-
 @Slf4j
 @Component
 public class ValidatorInterceptor implements HandlerInterceptor {
+
     private static final String resource = "ValidatorInterceptor";
     private static final String callbackURL = "X-CallbackURL";
     private static final String registeringInstitutionId = "X-Registering-Institution-ID";
-
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
@@ -40,7 +39,8 @@ public class ValidatorInterceptor implements HandlerInterceptor {
                 validatorBuilder.reset().resource(resource).parameter(callbackURL).value(request.getHeader(callbackURL))
                         .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_CALLBACK_URL);
 
-                validatorBuilder.reset().resource(resource).parameter(registeringInstitutionId).value(request.getHeader(registeringInstitutionId))
+                validatorBuilder.reset().resource(resource).parameter(registeringInstitutionId)
+                        .value(request.getHeader(registeringInstitutionId))
                         .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_REGISTERING_INSTITUTION_ID);
 
                 // If errors exist, set the response and return false

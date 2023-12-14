@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.transaction.Transactional;
-
 import org.mifos.connector.common.channel.dto.PhErrorDTO;
 import org.mifos.pheevouchermanagementsystem.data.RequestDTO;
 import org.mifos.pheevouchermanagementsystem.data.SuccessfulVouchers;
@@ -43,8 +42,8 @@ public class CreateVoucherService {
 
     @Autowired
     public CreateVoucherService(VoucherRepository voucherRepository, ErrorTrackingRepository errorTrackingRepository,
-                                SendCallbackService sendCallbackService, ObjectMapper objectMapper, ZeebeProcessStarter zeebeProcessStarter,
-                                VoucherValidator voucherValidator) {
+            SendCallbackService sendCallbackService, ObjectMapper objectMapper, ZeebeProcessStarter zeebeProcessStarter,
+            VoucherValidator voucherValidator) {
         this.voucherRepository = voucherRepository;
         this.errorTrackingRepository = errorTrackingRepository;
         this.sendCallbackService = sendCallbackService;
@@ -55,7 +54,7 @@ public class CreateVoucherService {
 
     public PhErrorDTO validateAndCreateVoucher(RequestDTO request, String callbackURL, String registeringInstitutionId) {
         PhErrorDTO phErrorDTO = voucherValidator.validateCreateVoucher(request);
-        if(phErrorDTO == null) createVouchers(request, callbackURL, registeringInstitutionId);
+        if (phErrorDTO == null) createVouchers(request, callbackURL, registeringInstitutionId);
 
         return phErrorDTO;
     }
