@@ -51,8 +51,8 @@ public class CreateVoucherService {
 
     @Autowired
     public CreateVoucherService(VoucherRepository voucherRepository, ErrorTrackingRepository errorTrackingRepository,
-                                SendCallbackService sendCallbackService, ObjectMapper objectMapper, ZeebeProcessStarter zeebeProcessStarter,
-                                VoucherValidator voucherValidator) {
+            SendCallbackService sendCallbackService, ObjectMapper objectMapper, ZeebeProcessStarter zeebeProcessStarter,
+            VoucherValidator voucherValidator) {
         this.voucherRepository = voucherRepository;
         this.errorTrackingRepository = errorTrackingRepository;
         this.sendCallbackService = sendCallbackService;
@@ -63,7 +63,7 @@ public class CreateVoucherService {
 
     public PhErrorDTO validateAndCreateVoucher(RequestDTO request, String callbackURL, String registeringInstitutionId) {
         PhErrorDTO phErrorDTO = voucherValidator.validateCreateVoucher(request);
-        if(phErrorDTO == null) createVouchers(request, callbackURL, registeringInstitutionId);
+        if (phErrorDTO == null) createVouchers(request, callbackURL, registeringInstitutionId);
 
         return phErrorDTO;
     }
