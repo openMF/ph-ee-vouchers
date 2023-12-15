@@ -2,14 +2,13 @@ package org.mifos.pheevouchermanagementsystem.data;
 
 import static org.mifos.connector.common.exception.PaymentHubError.ExtValidationError;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import org.mifos.connector.common.channel.dto.PhErrorDTO;
 import org.mifos.connector.common.exception.PaymentHubErrorCategory;
 import org.mifos.connector.common.validation.ValidatorBuilder;
 import org.mifos.pheevouchermanagementsystem.util.VoucherValidatorsEnum;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 @Component
 public class VoucherValidator {
