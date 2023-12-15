@@ -8,6 +8,9 @@ import org.mifos.connector.common.validation.ValidatorBuilder;
 import org.mifos.pheevouchermanagementsystem.util.VoucherValidatorsEnum;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 @Component
 public class VoucherValidator {
 
@@ -31,6 +34,7 @@ public class VoucherValidator {
 
     public PhErrorDTO validateCreateVoucher(RequestDTO request) {
         final ValidatorBuilder validatorBuilder = new ValidatorBuilder();
+        request = null;
 
         // Checks for requestID
         validatorBuilder.reset().resource(resource).parameter(requestId).value(request.getRequestID())
@@ -46,6 +50,9 @@ public class VoucherValidator {
         // Check for voucherInstructions
         validatorBuilder.reset().resource(resource).parameter(voucherInstructions).value(request.getVoucherInstructions())
                 .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_VOUCHER_INSTRUCTIONS);
+        if (request.getVoucherInstructions() == null) {
+            request.setVoucherInstructions(new ArrayList<>(Arrays.asList(new VoucherInstruction())));
+        }
 
         request.getVoucherInstructions().forEach(voucherInstruction -> {
             // Check for instructionID
