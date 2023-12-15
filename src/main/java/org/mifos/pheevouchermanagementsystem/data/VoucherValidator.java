@@ -33,7 +33,6 @@ public class VoucherValidator {
 
     public PhErrorDTO validateCreateVoucher(RequestDTO request) {
         final ValidatorBuilder validatorBuilder = new ValidatorBuilder();
-        request = null;
 
         // Checks for requestID
         validatorBuilder.reset().resource(resource).parameter(requestId).value(request.getRequestID())
@@ -79,8 +78,7 @@ public class VoucherValidator {
 
             // Check for payeeFunctionalID
             validatorBuilder.reset().resource(resource).parameter(payeeFunctionalID).value(voucherInstruction.getPayeeFunctionalID())
-                    .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_PAYEE_FUNCTIONAL_ID)
-                    .validateFieldNotBlankAndLengthWithFailureCodeAndErrorParams(expectedPayeeFunctionalIDLength,
+                    .ignoreIfNull().validateFieldNotBlankAndLengthWithFailureCodeAndErrorParams(expectedPayeeFunctionalIDLength,
                             VoucherValidatorsEnum.INVALID_PAYEE_FUNCTIONAL_ID_LENGTH);
 
             // Check for narration
