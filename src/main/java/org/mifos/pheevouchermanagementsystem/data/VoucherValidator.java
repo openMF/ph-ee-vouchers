@@ -37,12 +37,12 @@ public class VoucherValidator {
         // Checks for requestID
         validatorBuilder.reset().resource(resource).parameter(requestId).value(request.getRequestID())
                 .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_REQUEST_ID)
-                .validateFieldNotBlankAndLengthWithFailureCodeAndErrorParams(expectedRequestIdLength,
+                .validateFieldMaxLengthWithFailureCodeAndErrorParams(expectedRequestIdLength,
                         VoucherValidatorsEnum.INVALID_REQUEST_ID_LENGTH);
 
         // Checks for batchID
         validatorBuilder.reset().resource(resource).parameter(batchId).value(request.getBatchID())
-                .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_BATCH_ID).validateFieldNotBlankAndLengthWithFailureCodeAndErrorParams(
+                .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_BATCH_ID).validateFieldMaxLengthWithFailureCodeAndErrorParams(
                         expectedBatchIdLength, VoucherValidatorsEnum.INVALID_BATCH_ID_LENGTH);
 
         // Check for voucherInstructions
@@ -56,7 +56,7 @@ public class VoucherValidator {
             // Check for instructionID
             validatorBuilder.reset().resource(resource).parameter(instructionID).value(voucherInstruction.getInstructionID())
                     .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_INSTRUCTION_ID)
-                    .validateFieldNotBlankAndLengthWithFailureCodeAndErrorParams(expectedInstructionIdLength,
+                    .validateFieldMaxLengthWithFailureCodeAndErrorParams(expectedInstructionIdLength,
                             VoucherValidatorsEnum.INVALID_INSTRUCTION_ID_LENGTH);
 
             // Check for groupCode
@@ -78,12 +78,12 @@ public class VoucherValidator {
 
             // Check for payeeFunctionalID
             validatorBuilder.reset().resource(resource).parameter(payeeFunctionalID).value(voucherInstruction.getPayeeFunctionalID())
-                    .ignoreIfNull().validateFieldNotBlankAndLengthWithFailureCodeAndErrorParams(expectedPayeeFunctionalIDLength,
+                    .ignoreIfNull().validateFieldMaxLengthWithFailureCodeAndErrorParams(expectedPayeeFunctionalIDLength,
                             VoucherValidatorsEnum.INVALID_PAYEE_FUNCTIONAL_ID_LENGTH);
 
             // Check for narration
             validatorBuilder.reset().resource(resource).parameter(narration).value(voucherInstruction.getNarration()).ignoreIfNull()
-                    .validateFieldMaxLengthWithFailureCode(maximumNarrationLength, VoucherValidatorsEnum.INVALID_NARRATION_LENGTH);
+                    .validateFieldMaxLengthWithFailureCodeAndErrorParams(maximumNarrationLength, VoucherValidatorsEnum.INVALID_NARRATION_LENGTH);
         });
 
         // If errors exist, build and return PhErrorDTO
