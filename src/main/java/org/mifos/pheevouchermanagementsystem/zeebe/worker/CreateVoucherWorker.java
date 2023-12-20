@@ -61,8 +61,8 @@ public class CreateVoucherWorker extends BaseWorker {
                         new TypeReference<List<VoucherInstruction>>() {});
 
                 for (VoucherInstruction voucherInstruction : voucherInstructions) {
-                    createVoucherService.addVouchers(voucherInstruction, successfulVouchers, errorTrackingsList, existingVariables.get("registeringInstitutionId").toString(), batchId,
-                            requestId);
+                    createVoucherService.addVouchers(voucherInstruction, successfulVouchers, errorTrackingsList,
+                            existingVariables.get("registeringInstitutionId").toString(), batchId, requestId);
                 }
                 try {
                     sendCallbackService.sendCallback(
