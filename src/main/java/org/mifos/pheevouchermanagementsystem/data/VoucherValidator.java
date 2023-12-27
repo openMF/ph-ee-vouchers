@@ -43,14 +43,13 @@ public class VoucherValidator {
 
         // Checks for requestID
         validatorBuilder.reset().resource(resource).parameter(requestId).value(request.getRequestID())
-                .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_REQUEST_ID)
-                .validateFieldMaxLengthWithFailureCodeAndErrorParams(expectedRequestIdLength,
-                        VoucherValidatorsEnum.INVALID_REQUEST_ID_LENGTH);
+                .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_REQUEST_ID).validateFieldMaxLengthWithFailureCodeAndErrorParams(
+                        expectedRequestIdLength, VoucherValidatorsEnum.INVALID_REQUEST_ID_LENGTH);
 
         // Checks for batchID
         validatorBuilder.reset().resource(resource).parameter(batchId).value(request.getBatchID())
-                .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_BATCH_ID).validateFieldMaxLengthWithFailureCodeAndErrorParams(
-                        expectedBatchIdLength, VoucherValidatorsEnum.INVALID_BATCH_ID_LENGTH);
+                .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_BATCH_ID)
+                .validateFieldMaxLengthWithFailureCodeAndErrorParams(expectedBatchIdLength, VoucherValidatorsEnum.INVALID_BATCH_ID_LENGTH);
 
         // Check for voucherInstructions
         validatorBuilder.reset().resource(resource).parameter(voucherInstructions).value(request.getVoucherInstructions())
@@ -90,7 +89,8 @@ public class VoucherValidator {
 
             // Check for narration
             validatorBuilder.reset().resource(resource).parameter(narration).value(voucherInstruction.getNarration()).ignoreIfNull()
-                    .validateFieldMaxLengthWithFailureCodeAndErrorParams(maximumNarrationLength, VoucherValidatorsEnum.INVALID_NARRATION_LENGTH);
+                    .validateFieldMaxLengthWithFailureCodeAndErrorParams(maximumNarrationLength,
+                            VoucherValidatorsEnum.INVALID_NARRATION_LENGTH);
         });
 
         // If errors exist, build and return PhErrorDTO
