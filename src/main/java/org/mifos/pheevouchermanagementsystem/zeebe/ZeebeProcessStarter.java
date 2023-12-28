@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import org.mifos.connector.common.zeebe.ZeebeVariables;
-import org.mifos.pheevouchermanagementsystem.exception.ZeebeClientStatusException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +40,8 @@ public class ZeebeProcessStarter {
             logger.info("zeebee workflow instance from process {} started with transactionId {}, instance key: {}", workflowId, transactionId,
                     instance.getProcessInstanceKey());
         } catch (ClientStatusException e) {
-            throw new ZeebeClientStatusException("BPMN not found", e);
-        }  catch (RuntimeException e) {
+            throw e;
+        } catch (RuntimeException e) {
             throw new RuntimeException("Internal Server Occurred", e);
         }
 
