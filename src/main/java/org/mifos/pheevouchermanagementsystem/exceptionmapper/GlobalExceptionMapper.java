@@ -1,4 +1,4 @@
-package org.mifos.pheevouchermanagementsystem.exceptionMapper;
+package org.mifos.pheevouchermanagementsystem.exceptionmapper;
 
 import org.mifos.pheevouchermanagementsystem.data.ResponseDTO;
 import org.mifos.pheevouchermanagementsystem.exception.ZeebeClientStatusException;
@@ -16,13 +16,13 @@ public class GlobalExceptionMapper {
 
     @ExceptionHandler(ZeebeClientStatusException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ResponseDTO> ClientStatusException(ZeebeClientStatusException ex) {
+    public ResponseEntity<ResponseDTO> handleClientStatusException(ZeebeClientStatusException ex) {
         ResponseDTO responseDTO = new ResponseDTO(BPMN_NOT_FOUND.getValue(), BPMN_NOT_FOUND.getMessage(), ex.getId());
         return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body(responseDTO);
     }
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ResponseDTO> Exception(Exception ex) {
+    public ResponseEntity<ResponseDTO> handleException(Exception ex) {
         ResponseDTO responseDTO = new ResponseDTO(FAILED_RESPONSE.getValue(), FAILED_RESPONSE.getMessage(), null);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseDTO);
     }
