@@ -20,6 +20,8 @@ configurations {
 ext {
     camelVersion = '3.18.1'
     zeebClientVersion = '1.3.1'
+    springBootVersion = '2.7.12'
+
 }
 
 repositories {
@@ -54,6 +56,9 @@ dependencies {
     implementation 'org.json:json:20210307'
     checkstyle 'com.puppycrawl.tools:checkstyle:10.9.3'
     checkstyle 'com.github.sevntu-checkstyle:sevntu-checks:1.44.1'
+    implementation "org.springframework.boot:spring-boot-starter:$springBootVersion"
+    implementation "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
+    implementation "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion"
 }
 
 tasks.named('test') {
