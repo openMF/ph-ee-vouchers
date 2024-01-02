@@ -3,7 +3,7 @@ package org.mifos.pheevouchermanagementsystem.util;
 public enum VoucherManagementEnum {
 
     SUCCESS_RESPONSE("00", "Request successfully received by Pay-BB"), FAILED_RESPONSE("01",
-            "Request not acknowledged by Pay-BB"), BPMN_NOT_FOUND("01", "BPMN not found");
+            "Request not acknowledged by Pay-BB"), PROCESS_DEFINITION_NOT_FOUND("01", "Process definition not found");
 
     private final String value;
     private final String message;
