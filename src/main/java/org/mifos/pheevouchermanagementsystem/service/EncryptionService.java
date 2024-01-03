@@ -16,7 +16,7 @@ public class EncryptionService {
     @Value("${rsa-key.private}")
     private String privateKey;
 
-    @Value("${rsa-key.x509Certificate}")
+    @Value("${rsa-key.public}")
     private String publicKey;
 
     public String encrypt(String data) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException,
