@@ -6,11 +6,17 @@ import static org.mifos.pheevouchermanagementsystem.util.VoucherStatusEnum.INACT
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.transaction.Transactional;
 import org.mifos.pheevouchermanagementsystem.data.RequestDTO;
 import org.mifos.pheevouchermanagementsystem.data.SuccessfulVouchers;
@@ -36,6 +42,9 @@ public class CreateVoucherService {
     private final ZeebeProcessStarter zeebeProcessStarter;
 
     private static final Logger logger = LoggerFactory.getLogger(CreateVoucherService.class);
+
+    @Autowired
+    private EncryptionService encryptionService;
 
     @Autowired
     public CreateVoucherService(VoucherRepository voucherRepository, ErrorTrackingRepository errorTrackingRepository,
@@ -115,8 +124,9 @@ public class CreateVoucherService {
         try {
             voucherRepository.save(voucher);
             successfulVouchers.add(new SuccessfulVouchers(voucherInstruction.getInstructionID(), voucherInstruction.getCurrency(),
-                    voucherInstruction.getAmount(), voucherInstruction.getNarration(), voucherNumber, serialNumber));
-        } catch (RuntimeException exception) {
+                    voucherInstruction.getAmount(), voucherInstruction.getNarration(), encryptionService.encrypt(voucherNumber), serialNumber));
+        } catch (RuntimeException | NoSuchPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException |
+                 BadPaddingException | InvalidKeySpecException | InvalidKeyException exception) {
             ErrorTracking error = new ErrorTracking(requestId, voucherInstruction.getInstructionID(), exception.getMessage());
             errorTrackingList.add(error);
             try {
