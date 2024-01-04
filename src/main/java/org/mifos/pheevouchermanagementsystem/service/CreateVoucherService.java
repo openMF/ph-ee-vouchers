@@ -5,11 +5,17 @@ import static org.mifos.pheevouchermanagementsystem.util.VoucherStatusEnum.INACT
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.transaction.Transactional;
 import org.mifos.connector.common.util.SecurityUtil;
 import org.mifos.pheevouchermanagementsystem.data.RequestDTO;
@@ -36,6 +42,9 @@ public class CreateVoucherService {
     private final ZeebeProcessStarter zeebeProcessStarter;
 
     private static final Logger logger = LoggerFactory.getLogger(CreateVoucherService.class);
+
+    @Autowired
+    private EncryptionService encryptionService;
 
     @Autowired
     public CreateVoucherService(VoucherRepository voucherRepository, ErrorTrackingRepository errorTrackingRepository,
