@@ -1,6 +1,5 @@
 package org.mifos.pheevouchermanagementsystem.service;
 
-import static org.mifos.pheevouchermanagementsystem.util.EncryptVoucher.hashVoucherNumber;
 import static org.mifos.pheevouchermanagementsystem.util.RedemptionStatusEnum.FAILURE;
 import static org.mifos.pheevouchermanagementsystem.util.RedemptionStatusEnum.SUCCESS;
 import static org.mifos.pheevouchermanagementsystem.util.UniqueIDGenerator.generateUniqueNumber;
@@ -8,11 +7,18 @@ import static org.mifos.pheevouchermanagementsystem.util.VoucherStatusEnum.ACTIV
 import static org.mifos.pheevouchermanagementsystem.util.VoucherStatusEnum.UTILIZED;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import org.mifos.connector.common.util.SecurityUtil;
 import org.mifos.pheevouchermanagementsystem.data.RedeemVoucherRequestDTO;
 import org.mifos.pheevouchermanagementsystem.data.RedeemVoucherResponseDTO;
 import org.mifos.pheevouchermanagementsystem.domain.Voucher;
@@ -35,6 +41,9 @@ public class RedeemVoucherService {
     ZeebeProcessStarter zeebeProcessStarter;
 
     @Autowired
+    EncryptionService encryptionService;
+
+    @Autowired
     public RedeemVoucherService(VoucherRepository voucherRepository, ObjectMapper objectMapper) {
         this.voucherRepository = voucherRepository;
         this.objectMapper = objectMapper;
@@ -44,41 +53,54 @@ public class RedeemVoucherService {
         String transactionId = generateUniqueNumber(10);
         Voucher voucher = null;
         try {
-            voucher = voucherRepository.findBySerialNo(redeemVoucherRequestDTO.getVoucherSerialNumber())
-                    .orElseThrow(() -> VoucherNotFoundException.voucherNotFound(redeemVoucherRequestDTO.getVoucherSerialNumber()));
+            // find voucher by voucher no / secret code
+            /*
+             * String encryptedVoucher = "this is hidden voucher"; String voucherNum = decrypt(encryptedVoucher,
+             * publicKey) find in db: findBy(hash(voucherNum))
+             */
+            String voucherNumber = encryptionService.decrypt(redeemVoucherRequestDTO.getVoucherSecretNumber());
+            voucher = voucherRepository.findByVoucherNo(SecurityUtil.hash(voucherNumber))
+                    .orElseThrow(() -> VoucherNotFoundException.voucherNotFound(redeemVoucherRequestDTO.getVoucherSecretNumber()));
             // Boolean validate = validateVoucher(voucher);
             if (voucher.getStatus().equals(ACTIVE.getValue())
                     && voucher.getExpiryDate().toLocalDate().isAfter(LocalDate.now(ZoneId.systemDefault()))
-                    && voucher.getVoucherNo().equals(hashVoucherNumber(redeemVoucherRequestDTO.getVoucherSecretNumber()))
+                    && voucher.getVoucherNo().equals(SecurityUtil.hash(voucherNumber))
                     && voucher.getRegisteringInstitutionId().equals(registeringInstitutionId)) {
                 voucher.setStatus(UTILIZED.getValue());
                 voucherRepository.save(voucher);
 
             } else {
                 return new RedeemVoucherResponseDTO(FAILURE.getValue(), "Voucher Details Invalid!",
-                        redeemVoucherRequestDTO.getVoucherSerialNumber(), voucher.getAmount().toString(),
+                        redeemVoucherRequestDTO.getVoucherSecretNumber(), voucher.getAmount().toString(),
                         LocalDateTime.now(ZoneId.systemDefault()).toString(), transactionId);
             }
         } catch (RuntimeException e) {
             logger.error(e.getMessage());
-            return new RedeemVoucherResponseDTO(FAILURE.getValue(), "Voucher Not Found!", redeemVoucherRequestDTO.getVoucherSerialNumber(),
+            return new RedeemVoucherResponseDTO(FAILURE.getValue(), "Voucher Not Found!", redeemVoucherRequestDTO.getVoucherSecretNumber(),
                     "", LocalDateTime.now(ZoneId.systemDefault()).toString(), transactionId); // sendCallbackService.sendCallback("Requested
                                                                                               // resource not found!");
+        } catch (NoSuchPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException | BadPaddingException
+                | InvalidKeySpecException | InvalidKeyException e) {
+            logger.error(e.getMessage());
+            return new RedeemVoucherResponseDTO(FAILURE.getValue(), "Voucher number invalid!",
+                    redeemVoucherRequestDTO.getVoucherSecretNumber(), "", LocalDateTime.now(ZoneId.systemDefault()).toString(),
+                    transactionId);
         }
         return new RedeemVoucherResponseDTO(SUCCESS.getValue(), "Voucher redemption successful!",
-                redeemVoucherRequestDTO.getVoucherSerialNumber(), voucher.getAmount().toString(),
+                redeemVoucherRequestDTO.getVoucherSecretNumber(), voucher.getAmount().toString(),
                 LocalDateTime.now(ZoneId.systemDefault()).toString(), transactionId);
     }
 
     @Async("asyncExecutor")
     public void redeemAndPay(RedeemVoucherRequestDTO redeemVoucherRequestDTO, String callbackURL, String registeringInstitutionId) {
         try {
-            Voucher voucher = voucherRepository.findBySerialNo(redeemVoucherRequestDTO.getVoucherSerialNumber())
-                    .orElseThrow(() -> VoucherNotFoundException.voucherNotFound(redeemVoucherRequestDTO.getVoucherSerialNumber()));
+            String voucherNumber = encryptionService.decrypt(redeemVoucherRequestDTO.getVoucherSecretNumber());
+            Voucher voucher = voucherRepository.findByVoucherNo(SecurityUtil.hash(voucherNumber))
+                    .orElseThrow(() -> VoucherNotFoundException.voucherNotFound(redeemVoucherRequestDTO.getVoucherSecretNumber()));
             // Boolean validate = validateVoucher(voucher);
             if (voucher.getStatus().equals(ACTIVE.getValue())
                     && voucher.getExpiryDate().toLocalDate().isAfter(LocalDate.now(ZoneId.systemDefault()))
-                    && voucher.getVoucherNo().equals(hashVoucherNumber(redeemVoucherRequestDTO.getVoucherSecretNumber()))
+                    && voucher.getVoucherNo().equals(SecurityUtil.hash(voucherNumber))
                     && voucher.getRegisteringInstitutionId().equals(registeringInstitutionId)) {
                 voucher.setStatus(UTILIZED.getValue());
                 voucherRepository.save(voucher);
@@ -91,9 +113,10 @@ public class RedeemVoucherService {
             extraVariables.put("callbackURL", callbackURL);
             extraVariables.put("amount", voucher.getAmount());
             extraVariables.put("currency", voucher.getCurrency());
-            extraVariables.put("voucherSerialNumber", redeemVoucherRequestDTO.getVoucherSerialNumber());
+            extraVariables.put("voucherSerialNumber", redeemVoucherRequestDTO.getVoucherSecretNumber());
             zeebeProcessStarter.startZeebeWorkflow("redeem_and_pay_voucher", null, extraVariables);
-        } catch (RuntimeException e) {
+        } catch (RuntimeException | NoSuchPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException | BadPaddingException
+                | InvalidKeySpecException | InvalidKeyException e) {
             logger.error(e.getMessage());
         }
     }

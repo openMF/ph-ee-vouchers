@@ -6,8 +6,9 @@ import org.springframework.cache.annotation.EnableCaching;
 
 @EnableCaching
 @SpringBootApplication
-@SuppressWarnings({"HideUtilityClassConstructor"})
+@SuppressWarnings({ "HideUtilityClassConstructor" })
 public class PhEeVoucherManagementSystemApplication {
+
     public static void main(String[] args) {
         SpringApplication.run(PhEeVoucherManagementSystemApplication.class, args);
     }

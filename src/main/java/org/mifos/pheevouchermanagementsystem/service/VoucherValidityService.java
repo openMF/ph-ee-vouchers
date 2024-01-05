@@ -1,12 +1,12 @@
 package org.mifos.pheevouchermanagementsystem.service;
 
-import static org.mifos.pheevouchermanagementsystem.util.EncryptVoucher.hashVoucherNumber;
 import static org.mifos.pheevouchermanagementsystem.util.VoucherStatusEnum.ACTIVE;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import org.mifos.connector.common.util.SecurityUtil;
 import org.mifos.pheevouchermanagementsystem.data.ValidityDTO;
 import org.mifos.pheevouchermanagementsystem.domain.Voucher;
 import org.mifos.pheevouchermanagementsystem.exception.VoucherNotFoundException;
@@ -73,7 +73,7 @@ public class VoucherValidityService {
 
     public void checkValidityByVoucherNumberAndGroupCode(String voucherNumber, String groupCode, String callbackURL) {
         try {
-            Voucher voucher = voucherRepository.findByVoucherNo(hashVoucherNumber(voucherNumber))
+            Voucher voucher = voucherRepository.findByVoucherNo(SecurityUtil.hash(voucherNumber))
                     .orElseThrow(() -> VoucherNotFoundException.voucherNotFound(voucherNumber));
             String groupCodeVoucher = voucher.getGroupCode();
             if (voucher.getStatus().equals(ACTIVE.getValue())) {
@@ -88,7 +88,7 @@ public class VoucherValidityService {
             }
         } catch (RuntimeException e) {
             logger.error(e.getMessage());
-            if (!voucherRepository.existsByVoucherNo(hashVoucherNumber(voucherNumber))) {
+            if (!voucherRepository.existsByVoucherNo(SecurityUtil.hash(voucherNumber))) {
                 sendCallbackService.sendCallback("Requested resource not found!", callbackURL);
             }
         }
