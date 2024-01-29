@@ -1,6 +1,7 @@
 package org.mifos.pheevouchermanagementsystem.exception;
 
 public class ZeebeClientStatusException extends RuntimeException {
+
     private final String id;
 
     public String getId() {

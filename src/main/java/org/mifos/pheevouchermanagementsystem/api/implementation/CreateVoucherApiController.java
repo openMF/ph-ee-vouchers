@@ -1,13 +1,11 @@
 package org.mifos.pheevouchermanagementsystem.api.implementation;
 
-import static org.mifos.pheevouchermanagementsystem.util.VoucherManagementEnum.SUCCESS_RESPONSE;
-
-import lombok.extern.slf4j.Slf4j;
 import static org.mifos.pheevouchermanagementsystem.util.VoucherManagementEnum.FAILED_RESPONSE;
 import static org.mifos.pheevouchermanagementsystem.util.VoucherManagementEnum.SUCCESS_RESPONSE;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.concurrent.ExecutionException;
+import lombok.extern.slf4j.Slf4j;
 import org.mifos.connector.common.channel.dto.PhErrorDTO;
 import org.mifos.pheevouchermanagementsystem.api.definition.CreateVoucherApi;
 import org.mifos.pheevouchermanagementsystem.data.RequestDTO;
