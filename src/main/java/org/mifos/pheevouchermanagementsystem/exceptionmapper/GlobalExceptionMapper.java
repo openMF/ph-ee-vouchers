@@ -15,7 +15,8 @@ public class GlobalExceptionMapper {
 
     @ExceptionHandler(ZeebeClientStatusException.class)
     public ResponseEntity<ResponseDTO> handleClientStatusException(ZeebeClientStatusException ex) {
-        ResponseDTO responseDTO = new ResponseDTO(PROCESS_DEFINITION_NOT_FOUND.getValue(), PROCESS_DEFINITION_NOT_FOUND.getMessage(), ex.getId());
+        ResponseDTO responseDTO = new ResponseDTO(PROCESS_DEFINITION_NOT_FOUND.getValue(), PROCESS_DEFINITION_NOT_FOUND.getMessage(),
+                ex.getId());
         return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body(responseDTO);
     }
 

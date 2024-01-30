@@ -17,10 +17,12 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.transaction.Transactional;
+import org.mifos.connector.common.channel.dto.PhErrorDTO;
 import org.mifos.connector.common.util.SecurityUtil;
 import org.mifos.pheevouchermanagementsystem.data.RequestDTO;
 import org.mifos.pheevouchermanagementsystem.data.SuccessfulVouchers;
 import org.mifos.pheevouchermanagementsystem.data.VoucherInstruction;
+import org.mifos.pheevouchermanagementsystem.data.VoucherValidator;
 import org.mifos.pheevouchermanagementsystem.domain.ErrorTracking;
 import org.mifos.pheevouchermanagementsystem.domain.Voucher;
 import org.mifos.pheevouchermanagementsystem.exception.InstructionIdException;
@@ -40,6 +42,7 @@ public class CreateVoucherService {
     private final SendCallbackService sendCallbackService;
     private final ObjectMapper objectMapper;
     private final ZeebeProcessStarter zeebeProcessStarter;
+    private final VoucherValidator voucherValidator;
 
     private static final Logger logger = LoggerFactory.getLogger(CreateVoucherService.class);
 
@@ -48,15 +51,25 @@ public class CreateVoucherService {
 
     @Autowired
     public CreateVoucherService(VoucherRepository voucherRepository, ErrorTrackingRepository errorTrackingRepository,
-            SendCallbackService sendCallbackService, ObjectMapper objectMapper, ZeebeProcessStarter zeebeProcessStarter) {
+            SendCallbackService sendCallbackService, ObjectMapper objectMapper, ZeebeProcessStarter zeebeProcessStarter,
+            VoucherValidator voucherValidator) {
         this.voucherRepository = voucherRepository;
         this.errorTrackingRepository = errorTrackingRepository;
         this.sendCallbackService = sendCallbackService;
         this.objectMapper = objectMapper;
         this.zeebeProcessStarter = zeebeProcessStarter;
+        this.voucherValidator = voucherValidator;
     }
 
-    // @Async("asyncExecutor")
+    public PhErrorDTO validateAndCreateVoucher(RequestDTO request, String callbackURL, String registeringInstitutionId) {
+        PhErrorDTO phErrorDTO = voucherValidator.validateCreateVoucher(request);
+        if (phErrorDTO == null) {
+            createVouchers(request, callbackURL, registeringInstitutionId);
+        }
+
+        return phErrorDTO;
+    }
+
     public void createVouchers(RequestDTO request, String callbackURL, String registeringInstitutionId) {
         List<VoucherInstruction> voucherInstructionList = request.getVoucherInstructions();
         List<ErrorTracking> errorTrackingsList = new ArrayList<>();

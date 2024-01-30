@@ -38,8 +38,8 @@ public class ZeebeProcessStarter {
         try {
             ProcessInstanceEvent instance = zeebeClient.newCreateInstanceCommand().bpmnProcessId(workflowId).latestVersion()
                     .variables(variables).send().join();
-            logger.info("zeebee workflow instance from process {} started with transactionId {}, instance key: {}", workflowId, transactionId,
-                    instance.getProcessInstanceKey());
+            logger.info("zeebee workflow instance from process {} started with transactionId {}, instance key: {}", workflowId,
+                    transactionId, instance.getProcessInstanceKey());
         } catch (ClientStatusException ex) {
             throw new ZeebeClientStatusException(ex.getMessage(), extraVariables.get("requestId").toString(), ex);
         }
