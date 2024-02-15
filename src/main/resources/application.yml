@@ -80,4 +80,4 @@ management:
       readiness:
         enabled: true
 
-paymentmodality: "01"
+defaultPaymentModality: "01"

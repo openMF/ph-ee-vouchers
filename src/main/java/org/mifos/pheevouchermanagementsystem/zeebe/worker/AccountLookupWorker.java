@@ -50,7 +50,7 @@ public class AccountLookupWorker extends BaseWorker {
     private String payerIdentifierType;
     @Value("${zeebe.client.evenly-allocated-max-jobs}")
     private int workerMaxJobs;
-    @Value("${paymentmodality}")
+    @Value("${defaultPaymentModality}")
     private String paymentModality;
     private static final Logger logger = LoggerFactory.getLogger(AccountLookupWorker.class);
 
