@@ -56,10 +56,11 @@ public class CheckTransferStatusWorker {
             requestSpec.relaxedHTTPSValidation();
             requestSpec.header("Platform-TenantId", existingVariables.get("partyLookupFspId").toString());
             requestSpec.header("Content-Type", "application/json");
-            String clientCorrelationId  = existingVariables.get("clientCorrelationId").toString();
+            String clientCorrelationId = existingVariables.get("clientCorrelationId").toString();
 
             String response = RestAssured.given(requestSpec).baseUri(operationHostname).expect()
-                    .spec(new ResponseSpecBuilder().expectStatusCode(200).build()).when().get(transfersEndpoint+"&clientCorrelationId="+clientCorrelationId).andReturn().asString();
+                    .spec(new ResponseSpecBuilder().expectStatusCode(200).build()).when()
+                    .get(transfersEndpoint + "&clientCorrelationId=" + clientCorrelationId).andReturn().asString();
 
             JSONObject responseJson = new JSONObject(response);
             String status = null;
