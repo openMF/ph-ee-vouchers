@@ -11,7 +11,6 @@ import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.PAYER_I
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.PAYMENT_MODALITY;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.REGISTERING_INSTITUTION_ID;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.REQUEST_ID;
-import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.TENANT_ID;
 import static org.mifos.pheevouchermanagementsystem.zeebe.worker.Worker.ACCOUNT_LOOKUP;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
