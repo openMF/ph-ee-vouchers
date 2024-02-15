@@ -8,8 +8,10 @@ import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.INITIAT
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.PAYEE_IDENTITY;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.PAYER_IDENTIFIER;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.PAYER_IDENTIFIER_TYPE;
+import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.PAYMENT_MODALITY;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.REGISTERING_INSTITUTION_ID;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.REQUEST_ID;
+import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.TENANT_ID;
 import static org.mifos.pheevouchermanagementsystem.zeebe.worker.Worker.ACCOUNT_LOOKUP;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -49,6 +51,8 @@ public class AccountLookupWorker extends BaseWorker {
     private String payerIdentifierType;
     @Value("${zeebe.client.evenly-allocated-max-jobs}")
     private int workerMaxJobs;
+    @Value("${paymentmodality}")
+    private String paymentModality;
     private static final Logger logger = LoggerFactory.getLogger(AccountLookupWorker.class);
 
     @Override
@@ -62,6 +66,7 @@ public class AccountLookupWorker extends BaseWorker {
             existingVariables.put(PAYER_IDENTIFIER_TYPE, payerIdentifierType);
 
             existingVariables.put(INITIATOR_FSP_ID, payerTenant);
+            existingVariables.put(REQUEST_ID, job.getKey());
 
             Exchange exchange = new DefaultExchange(camelContext);
             exchange.setProperty(HOST, identityMapperURL);
@@ -70,6 +75,7 @@ public class AccountLookupWorker extends BaseWorker {
             exchange.setProperty(REQUEST_ID, job.getKey());
             exchange.setProperty(REGISTERING_INSTITUTION_ID, existingVariables.get("registeringInstitutionId").toString());
             exchange.setProperty(PAYEE_IDENTITY, existingVariables.get("payeeIdentity").toString());
+            exchange.setProperty(PAYMENT_MODALITY, paymentModality);
             // exchange.setProperty("paymentModality", existingVariables.get("paymentModality").toString());
             producerTemplate.send("direct:send-account-lookup", exchange);
 
