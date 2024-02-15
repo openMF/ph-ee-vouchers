@@ -32,7 +32,8 @@ public class AccountLookupRoute extends BaseRouteBuilder {
         }).setHeader(Exchange.HTTP_METHOD, constant("GET"))
                 .setHeader(Exchange.HTTP_QUERY,
                         simple(new StringBuilder().append(PAYEE_IDENTITY).append("=${exchangeProperty.").append(PAYEE_IDENTITY).append("}&")
-                                .append("requestId=${exchangeProperty.requestId}").toString()))
+                                .append("requestId=${exchangeProperty.requestId}")
+                                .append("&paymentModality=${exchangeProperty.paymentModality}").toString()))
                 .setProperty(HOST, simple("{{identity-account-mapper.hostname}}")).setProperty(ENDPOINT, simple("beneficiary/"))
                 .to("direct:external-api-calling");
     }

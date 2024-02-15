@@ -16,5 +16,6 @@ public final class ZeebeVariables {
     public static final String PAYER_IDENTIFIER_TYPE = "payerIdentifierType";
     public static final String REQUEST_ID = "requestId";
     public static final String PAYEE_IDENTITY = "payeeIdentity";
+    public static final String PAYMENT_MODALITY = "paymentModality";
 
 }

@@ -15,7 +15,7 @@ spring:
 
 logging:
   level:
-    ROOT: DEBUG
+    ROOT: INFO
 
 async:
   core_pool_size: 10
@@ -79,3 +79,5 @@ management:
         enabled: true
       readiness:
         enabled: true
+
+defaultPaymentModality: "01"
