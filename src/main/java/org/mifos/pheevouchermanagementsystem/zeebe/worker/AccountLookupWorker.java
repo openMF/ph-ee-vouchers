@@ -69,7 +69,7 @@ public class AccountLookupWorker extends BaseWorker {
 
             Exchange exchange = new DefaultExchange(camelContext);
             exchange.setProperty(HOST, identityMapperURL);
-            exchange.setProperty(CALLBACK, voucherHostname + "/accountLookup/Callback");
+            exchange.setProperty(CALLBACK, identityMapperURL + "/accountLookupCallback");
             exchange.setProperty(TRANSACTION_ID, existingVariables.get(TRANSACTION_ID));
             exchange.setProperty(REQUEST_ID, job.getKey());
             exchange.setProperty(REGISTERING_INSTITUTION_ID, existingVariables.get("registeringInstitutionId").toString());
