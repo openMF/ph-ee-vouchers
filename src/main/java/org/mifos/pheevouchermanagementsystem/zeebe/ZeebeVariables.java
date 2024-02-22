@@ -17,5 +17,9 @@ public final class ZeebeVariables {
     public static final String REQUEST_ID = "requestId";
     public static final String PAYEE_IDENTITY = "payeeIdentity";
     public static final String PAYMENT_MODALITY = "paymentModality";
+    public static final String MAX_RETRY = "maxRetry";
+    public static final String RETRY = "retry";
+    public static final String THRESHOLD_DELAY = "thresholdDelay";
+    public static final String TRANSACTION_COMPLETED = "transactionCompleted";
 
 }
