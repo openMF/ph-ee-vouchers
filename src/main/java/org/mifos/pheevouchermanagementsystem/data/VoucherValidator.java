@@ -131,10 +131,6 @@ public class VoucherValidator {
                     .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_SERIAL_NUMBER)
                     .validateFieldNotBlankAndLengthWithFailureCodeAndErrorParams(expectedSerialNumberLength,
                             VoucherValidatorsEnum.INVALID_SERIAL_NUMBER_LENGTH);
-
-            // Check for status
-            // validatorBuilder.reset().resource(resource).parameter("status").value(voucherInstruction.getStatus())
-            // .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_STATUS);
         });
 
         // If errors exist, build and return PhErrorDTO

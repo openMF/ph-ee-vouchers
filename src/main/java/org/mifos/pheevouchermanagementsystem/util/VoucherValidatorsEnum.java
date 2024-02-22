@@ -45,8 +45,9 @@ public enum VoucherValidatorsEnum implements ValidationCodeType {
                                     "error.msg.schema.narration.length.is.invalid", "Narration is invalid"), INVALID_LENGTH(
                                             "error.msg.schema.length.is.invalid", "Length is invalid"), INVALID_LIST(
                                                     "error.msg.schema.list.is.invalid", "List is invalid"), INVALID_MAX_LENGTH(
-                                                            "error.msg.schema.max.length.cannot.exceed.50.words", "Cannot exceed 50 words"),
-    VOUCHER_LIFECYCLE_VALIDATION_ERROR("error.msg.voucher.lifecycle.validation.errors",
+                                                            "error.msg.schema.max.length.cannot.exceed.50.words",
+                                                            "Cannot exceed 50 words"), VOUCHER_LIFECYCLE_VALIDATION_ERROR(
+                                                                    "error.msg.voucher.lifecycle.validation.errors",
                                                                     "Voucher lifecycle validation failed"), INVALID_SERIAL_NUMBER(
                                                                             "error.msg.schema.serial.number.cannot.be.null.or.empty",
                                                                             "Serial number cannot be null or empty"), INVALID_SERIAL_NUMBER_LENGTH(
