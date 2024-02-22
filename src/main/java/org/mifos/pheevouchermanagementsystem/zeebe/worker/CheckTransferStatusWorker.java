@@ -12,7 +12,6 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.specification.RequestSpecification;
-
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Map;
@@ -70,12 +69,12 @@ public class CheckTransferStatusWorker {
 
             existingVariables.put(THRESHOLD_DELAY, thresholdDelay);
             existingVariables.put(MAX_RETRY, maxRetry);
-            existingVariables.put(TRANSACTION_COMPLETED,false);
+            existingVariables.put(TRANSACTION_COMPLETED, false);
 
             int retry = existingVariables.getOrDefault(RETRY, 0).equals(existingVariables.get(MAX_RETRY)) ? 0
                     : (int) existingVariables.getOrDefault(RETRY, 0);
-            if(retry<=maxRetry) {
-                logger.info("No of retry {} of max retry count {}", retry,maxRetry);
+            if (retry <= maxRetry) {
+                logger.info("No of retry {} of max retry count {}", retry, maxRetry);
                 RequestSpecification requestSpec = new RequestSpecBuilder().build();
                 requestSpec.relaxedHTTPSValidation();
                 requestSpec.header("Platform-TenantId", existingVariables.get("partyLookupFspId").toString());
@@ -90,19 +89,19 @@ public class CheckTransferStatusWorker {
                 String status = null;
                 if (responseJson.has("content")) {
                     JSONArray contentArray = responseJson.getJSONArray("content");
-                    logger.info("content length {}",contentArray.length());
+                    logger.info("content length {}", contentArray.length());
                     if (contentArray.length() > 0) {
                         JSONObject contentObject = contentArray.getJSONObject(0);
-                        logger.info("content object {}",contentObject.has("status"));
+                        logger.info("content object {}", contentObject.has("status"));
                         if (contentObject.has("status")) {
                             status = contentObject.getString("status");
                         }
-                    }else{
+                    } else {
                         retry++;
-                        existingVariables.put(RETRY,retry);
+                        existingVariables.put(RETRY, retry);
                     }
                 }
-                logger.info("Status: ",status);
+                logger.info("Status: ", status);
                 if (status != null) {
                     if (!status.equals("COMPLETED")) {
                         try {
@@ -110,21 +109,21 @@ public class CheckTransferStatusWorker {
                                     .orElseThrow(() -> VoucherNotFoundException
                                             .voucherNotFound(existingVariables.get("voucherSerialNumber").toString()));
                             voucher.setStatus(ACTIVE.getValue());
-                            existingVariables.put(TRANSACTION_COMPLETED,false);
+                            existingVariables.put(TRANSACTION_COMPLETED, false);
                             logger.info("Updating voucher status as ACTIVE redemption FAILED");
                             voucherRepository.save(voucher);
                         } catch (RuntimeException e) {
                             logger.error(e.getMessage());
                         }
                     }
-                    if(status.equals("COMPLETED")){
-                        existingVariables.put(TRANSACTION_COMPLETED,true);
+                    if (status.equals("COMPLETED")) {
+                        existingVariables.put(TRANSACTION_COMPLETED, true);
                         RedeemVoucherResponseDTO redeemVoucherResponseDTO = new RedeemVoucherResponseDTO(status,
                                 "Voucher redemption successful", existingVariables.get("voucherSerialNumber").toString(), null,
                                 LocalDateTime.now(ZoneId.systemDefault()).toString(), existingVariables.get("transactionId").toString());
                         ObjectMapper objectMapper = new ObjectMapper();
                         String body = objectMapper.writeValueAsString(redeemVoucherResponseDTO);
-                        logger.info("Sending callback on URL: {}",existingVariables.get("callbackURL"));
+                        logger.info("Sending callback on URL: {}", existingVariables.get("callbackURL"));
                         sendCallbackService.sendCallback(body, existingVariables.get("callbackURL").toString());
                     }
                 }
