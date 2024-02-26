@@ -13,5 +13,6 @@ public class RedeemVoucherRequestDTO {
 
     private String requestId;
     private String agentId;
+    private String voucherSerialNumber;
     private String voucherSecretNumber;
 }

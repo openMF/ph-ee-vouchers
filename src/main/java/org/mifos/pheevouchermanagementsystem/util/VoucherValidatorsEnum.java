@@ -26,8 +26,8 @@ public enum VoucherValidatorsEnum implements ValidationCodeType {
     INVALID_VOUCHER_INSTRUCTIONS("error.msg.schema.voucher.instructions.cannot.be.null.or.empty",
             "Voucher instructions cannot be null or empty"), INVALID_INSTRUCTION_ID(
                     "error.msg.schema.instruction.id.cannot.be.null.or.empty",
-                    "Instruction ID cannot be null or empty"), INVALID_INSTRUCTION_ID_LENGTH(
-                            "error.msg.schema.instruction.id.length.is.invalid", "Instruction ID length is invalid"),
+                    "Instruction Id cannot be null or empty"), INVALID_INSTRUCTION_ID_LENGTH(
+                            "error.msg.schema.instruction.id.length.is.invalid", "Instruction Id length is invalid"),
 
     INVALID_GROUP_CODE("error.msg.schema.group.code.cannot.be.null.or.empty",
             "Group Code cannot be null or empty"), INVALID_GROUP_CODE_LENGTH("error.msg.schema.group.code.length.is.invalid",
@@ -39,9 +39,9 @@ public enum VoucherValidatorsEnum implements ValidationCodeType {
     INVALID_AMOUNT("error.msg.schema.amount.cannot.be.null.or.empty", "Amount cannot be null or empty"), INVALID_NEGATIVE_AMOUNT(
             "error.msg.schema.amount.cannot.be.negative",
             "Amount cannot be negative"), INVALID_PAYEE_FUNCTIONAL_ID("error.msg.schema.payee.functional.id.cannot.be.null.or.empty",
-                    "PayeeFunctional ID cannot be null or empty"), INVALID_PAYEE_FUNCTIONAL_ID_LENGTH(
+                    "PayeeFunctional Id cannot be null or empty"), INVALID_PAYEE_FUNCTIONAL_ID_LENGTH(
                             "error.msg.schema.payee.functional.id.length.is.invalid",
-                            "PayeeFunctional ID length is invalid"), INVALID_NARRATION_LENGTH(
+                            "PayeeFunctional Id length is invalid"), INVALID_NARRATION_LENGTH(
                                     "error.msg.schema.narration.length.is.invalid", "Narration is invalid"), INVALID_LENGTH(
                                             "error.msg.schema.length.is.invalid", "Length is invalid"), INVALID_LIST(
                                                     "error.msg.schema.list.is.invalid", "List is invalid"), INVALID_MAX_LENGTH(
@@ -60,9 +60,9 @@ public enum VoucherValidatorsEnum implements ValidationCodeType {
                                                                                                             "error.msg.redeem.voucher.validation.errors",
                                                                                                             "Redeem voucher validation failed"), INVALID_AGENT_ID(
                                                                                                                     "error.msg.schema.agent.id.cannot.be.null.or.empty",
-                                                                                                                    "Agent ID cannot be null or empty"), INVALID_AGENT_ID_LENGTH(
+                                                                                                                    "Agent Id cannot be null or empty"), INVALID_AGENT_ID_LENGTH(
                                                                                                                             "error.msg.schema.agent.id.length.is.invalid",
-                                                                                                                            "Agent ID length is invalid"), INVALID_VOUCHER_SERIAL_NUMBER(
+                                                                                                                            "Agent Id length is invalid"), INVALID_VOUCHER_SERIAL_NUMBER(
                                                                                                                                     "error.msg.schema.voucher.serial.number.cannot.be.null.or.empty",
                                                                                                                                     "Voucher serial number cannot be null or empty"), INVALID_VOUCHER_SERIAL_NUMBER_LENGTH(
                                                                                                                                             "error.msg.schema.voucher.serial.number.length.is.invalid",

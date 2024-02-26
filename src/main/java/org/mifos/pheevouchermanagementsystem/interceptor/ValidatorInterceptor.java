@@ -69,14 +69,18 @@ public class ValidatorInterceptor implements HandlerInterceptor {
             } else if (handlerMethod.getBeanType().equals(VoucherLifecycleManagementApiController.class)) {
                 // Using ValidatorBuilder for header validation
                 final ValidatorBuilder validatorBuilder = new ValidatorBuilder();
-                validatorBuilder.reset().resource(resource).parameter(callbackURL).value(request.getHeader(callbackURL))
-                        .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_CALLBACK_URL)
-                        .validateFieldMaxLengthWithFailureCodeAndErrorParams(100, VoucherValidatorsEnum.INVALID_CALLBACK_URL_LENGTH);
+
+                String command = request.getParameter("command");
+                if (command.equals("activate") || command.equals("cancel")) {
+                    validatorBuilder.reset().resource(resource).parameter(callbackURL).value(request.getHeader(callbackURL))
+                            .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_CALLBACK_URL)
+                            .validateFieldMaxLengthWithFailureCodeAndErrorParams(100, VoucherValidatorsEnum.INVALID_CALLBACK_URL_LENGTH);
+                }
 
                 validatorBuilder.reset().resource(resource).parameter(registeringInstitutionId)
                         .value(request.getHeader(registeringInstitutionId))
                         .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_REGISTERING_INSTITUTION_ID)
-                        .validateFieldNotBlankAndLengthWithFailureCodeAndErrorParams(20,
+                        .validateFieldMaxLengthWithFailureCodeAndErrorParams(20,
                                 VoucherValidatorsEnum.INVALID_REGISTERING_INSTITUTION_ID_LENGTH);
 
                 // If errors exist, set the response and return false

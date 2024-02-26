@@ -19,20 +19,20 @@ public class VoucherValidator {
     private static final String batchId = "batchId";
     private static final int expectedBatchIdLength = 12;
     private static final String voucherInstructions = "voucherInstructions";
-    private static final String instructionID = "instructionID";
+    private static final String instructionID = "instructionId";
     private static final int expectedInstructionIdLength = 16;
     private static final String groupCode = "groupCode";
     private static final int expectedGroupCodeLength = 3;
     private static final String currency = "currency";
     private static final int expectedCurrencyLength = 3;
     private static final String amount = "amount";
-    private static final String payeeFunctionalID = "payeeFunctionalID";
+    private static final String payeeFunctionalID = "payeeFunctionalId";
     private static final int expectedPayeeFunctionalIDLength = 20;
     private static final String narration = "narration";
     private static final int maximumNarrationLength = 50;
     private static final String serialNumber = "serialNumber";
-    private static final int expectedSerialNumberLength = 6;
-    private static final String agentID = "serialNumber";
+    private static final int expectedSerialNumberLength = 20;
+    private static final String agentID = "agentId";
     private static final int expectedAgentIDLength = 10;
     private static final String voucherSerialNumber = "voucherSerialNumber";
     private static final String voucherSecretNumber = "voucherSecretNumber";
@@ -113,24 +113,26 @@ public class VoucherValidator {
         final ValidatorBuilder validatorBuilder = new ValidatorBuilder();
         // Checks for requestID
         validatorBuilder.reset().resource(resource).parameter(requestId).value(request.getRequestID())
-                .validateFieldNotBlankAndLengthWithFailureCodeAndErrorParams(expectedRequestIdLength,
+                .validateFieldMaxLengthWithFailureCodeAndErrorParams(expectedRequestIdLength,
                         VoucherValidatorsEnum.INVALID_REQUEST_ID_LENGTH);
 
         // Checks for batchID
         validatorBuilder.reset().resource(resource).parameter(batchId).value(request.getBatchID())
-                .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_BATCH_ID).validateFieldNotBlankAndLengthWithFailureCodeAndErrorParams(
-                        expectedBatchIdLength, VoucherValidatorsEnum.INVALID_BATCH_ID_LENGTH);
+                .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_BATCH_ID)
+                .validateFieldMaxLengthWithFailureCodeAndErrorParams(expectedBatchIdLength, VoucherValidatorsEnum.INVALID_BATCH_ID_LENGTH);
 
         // Check for voucherInstructions
         validatorBuilder.reset().resource(resource).parameter(voucherInstructions).value(request.getVoucherInstructions())
                 .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_VOUCHER_INSTRUCTIONS);
+        if (request.getVoucherInstructions() == null) {
+            request.setVoucherInstructions(new ArrayList<>(Arrays.asList(new VoucherInstruction())));
+        }
 
         request.getVoucherInstructions().forEach(voucherInstruction -> {
             // Check for serialNumber
             validatorBuilder.reset().resource(resource).parameter(serialNumber).value(voucherInstruction.getSerialNumber())
-                    .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_SERIAL_NUMBER)
-                    .validateFieldNotBlankAndLengthWithFailureCodeAndErrorParams(expectedSerialNumberLength,
-                            VoucherValidatorsEnum.INVALID_SERIAL_NUMBER_LENGTH);
+                    .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_SERIAL_NUMBER).validateFieldMaxLengthWithFailureCodeAndErrorParams(
+                            expectedSerialNumberLength, VoucherValidatorsEnum.INVALID_SERIAL_NUMBER_LENGTH);
         });
 
         // If errors exist, build and return PhErrorDTO
@@ -154,14 +156,13 @@ public class VoucherValidator {
 
         // Check for requestID
         validatorBuilder.reset().resource(resource).parameter(requestId).value(request.getRequestId())
-                .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_REQUEST_ID)
-                .validateFieldNotBlankAndLengthWithFailureCodeAndErrorParams(expectedRequestIdLength,
-                        VoucherValidatorsEnum.INVALID_REQUEST_ID_LENGTH);
+                .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_REQUEST_ID).validateFieldMaxLengthWithFailureCodeAndErrorParams(
+                        expectedRequestIdLength, VoucherValidatorsEnum.INVALID_REQUEST_ID_LENGTH);
 
         // Check for agentID
         validatorBuilder.reset().resource(resource).parameter(agentID).value(request.getAgentId())
-                .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_AGENT_ID).validateFieldNotBlankAndLengthWithFailureCodeAndErrorParams(
-                        expectedAgentIDLength, VoucherValidatorsEnum.INVALID_AGENT_ID_LENGTH);
+                .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_AGENT_ID)
+                .validateFieldMaxLengthWithFailureCodeAndErrorParams(expectedAgentIDLength, VoucherValidatorsEnum.INVALID_AGENT_ID_LENGTH);
 
         // Check for voucherSecretNumber
         validatorBuilder.reset().resource(resource).parameter(voucherSecretNumber).value(request.getVoucherSecretNumber())
