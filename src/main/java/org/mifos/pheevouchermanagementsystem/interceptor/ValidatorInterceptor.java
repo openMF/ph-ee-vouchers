@@ -11,6 +11,7 @@ import org.mifos.connector.common.channel.dto.PhErrorDTO;
 import org.mifos.connector.common.exception.PaymentHubErrorCategory;
 import org.mifos.connector.common.validation.ValidatorBuilder;
 import org.mifos.pheevouchermanagementsystem.api.implementation.CreateVoucherApiController;
+import org.mifos.pheevouchermanagementsystem.api.implementation.VoucherLifecycleManagementApiController;
 import org.mifos.pheevouchermanagementsystem.util.VoucherValidatorsEnum;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -42,6 +43,45 @@ public class ValidatorInterceptor implements HandlerInterceptor {
                 validatorBuilder.reset().resource(resource).parameter(registeringInstitutionId)
                         .value(request.getHeader(registeringInstitutionId))
                         .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_REGISTERING_INSTITUTION_ID);
+
+                // If errors exist, set the response and return false
+                if (validatorBuilder.hasError()) {
+                    validatorBuilder.errorCategory(PaymentHubErrorCategory.Validation.toString())
+                            .errorCode(VoucherValidatorsEnum.VOUCHER_HEADER_VALIDATION_ERROR.getCode())
+                            .errorDescription(VoucherValidatorsEnum.VOUCHER_HEADER_VALIDATION_ERROR.getMessage())
+                            .developerMessage(VoucherValidatorsEnum.VOUCHER_HEADER_VALIDATION_ERROR.getMessage())
+                            .defaultUserMessage(VoucherValidatorsEnum.VOUCHER_HEADER_VALIDATION_ERROR.getMessage());
+
+                    PhErrorDTO.PhErrorDTOBuilder phErrorDTOBuilder = new PhErrorDTO.PhErrorDTOBuilder(ExtValidationError.getErrorCode());
+                    phErrorDTOBuilder.fromValidatorBuilder(validatorBuilder);
+
+                    // Converting PHErrorDTO in JSON Format
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    String jsonResponse = objectMapper.writeValueAsString(phErrorDTOBuilder.build());
+
+                    // Setting response status and writing the error message
+                    response.setHeader("Content-Type", "application/json");
+                    response.setStatus(HttpStatus.BAD_REQUEST.value());
+                    response.getWriter().write(jsonResponse);
+
+                    return false;
+                }
+            } else if (handlerMethod.getBeanType().equals(VoucherLifecycleManagementApiController.class)) {
+                // Using ValidatorBuilder for header validation
+                final ValidatorBuilder validatorBuilder = new ValidatorBuilder();
+
+                String command = request.getParameter("command");
+                if (command.equals("activate") || command.equals("cancel")) {
+                    validatorBuilder.reset().resource(resource).parameter(callbackURL).value(request.getHeader(callbackURL))
+                            .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_CALLBACK_URL)
+                            .validateFieldMaxLengthWithFailureCodeAndErrorParams(100, VoucherValidatorsEnum.INVALID_CALLBACK_URL_LENGTH);
+                }
+
+                validatorBuilder.reset().resource(resource).parameter(registeringInstitutionId)
+                        .value(request.getHeader(registeringInstitutionId))
+                        .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_REGISTERING_INSTITUTION_ID)
+                        .validateFieldMaxLengthWithFailureCodeAndErrorParams(20,
+                                VoucherValidatorsEnum.INVALID_REGISTERING_INSTITUTION_ID_LENGTH);
 
                 // If errors exist, set the response and return false
                 if (validatorBuilder.hasError()) {
