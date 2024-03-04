@@ -18,6 +18,7 @@ public interface VoucherLifecycleManagementApi {
     <T> ResponseEntity<T> voucherStatusChange(@RequestHeader(value = "X-CallbackURL") String callbackURL,
             @RequestHeader(value = "X-Registering-Institution-ID") String registeringInstitutionId,
             @RequestHeader(value = "X-Program-ID", required = false) String programId, @RequestBody Object requestBody,
-            @RequestParam(value = "command") String command)
+            @RequestParam(value = "command") String command,
+            @RequestHeader(value = "isExternalLookup", required = false) Boolean isExternalLookup)
             throws ExecutionException, InterruptedException, JsonProcessingException, JsonProcessingException;
 }

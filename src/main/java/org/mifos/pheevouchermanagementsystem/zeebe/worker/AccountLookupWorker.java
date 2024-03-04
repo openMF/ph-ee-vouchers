@@ -5,6 +5,7 @@ import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.CACHED_
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.CALLBACK;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.HOST;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.INITIATOR_FSP_ID;
+import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.IS_EXTERNAL_LOOKUP;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.PAYEE_IDENTITY;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.PAYER_IDENTIFIER;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.PAYER_IDENTIFIER_TYPE;
@@ -75,9 +76,12 @@ public class AccountLookupWorker extends BaseWorker {
             exchange.setProperty(REGISTERING_INSTITUTION_ID, existingVariables.get("registeringInstitutionId").toString());
             exchange.setProperty(PAYEE_IDENTITY, existingVariables.get("payeeIdentity").toString());
             exchange.setProperty(PAYMENT_MODALITY, paymentModality);
+            exchange.setProperty(IS_EXTERNAL_LOOKUP, existingVariables.get(IS_EXTERNAL_LOOKUP));
             // exchange.setProperty("paymentModality", existingVariables.get("paymentModality").toString());
             producerTemplate.send("direct:send-account-lookup", exchange);
 
+            existingVariables.put("statusCode",exchange.getIn().getHeader("CamelHttpResponseCode"));
+            logger.info((existingVariables.get("statusCode").toString()));
             client.newCompleteCommand(job.getKey()).variables(existingVariables).send();
         }).name("payee-account-Lookup-voucher").maxJobsActive(workerMaxJobs).open();
 

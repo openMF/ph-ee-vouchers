@@ -4,6 +4,7 @@ import static org.mifos.pheevouchermanagementsystem.camel.config.CamelProperties
 import static org.mifos.pheevouchermanagementsystem.camel.config.CamelProperties.HOST;
 import static org.mifos.pheevouchermanagementsystem.camel.config.CamelProperties.PAYEE_IDENTITY;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.CALLBACK;
+import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.IS_EXTERNAL_LOOKUP;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.REGISTERING_INSTITUTION_ID;
 
 import org.apache.camel.Exchange;
@@ -29,6 +30,7 @@ public class AccountLookupRoute extends BaseRouteBuilder {
             String callbackUrl = exchange.getProperty(CALLBACK, String.class);
             exchange.getIn().setHeader(CALLBACK, callbackUrl);
             exchange.getIn().setHeader("X-Registering-Institution-ID", exchange.getProperty(REGISTERING_INSTITUTION_ID));
+            exchange.getIn().setHeader("isExternalLookup", exchange.getProperty(IS_EXTERNAL_LOOKUP));
         }).setHeader(Exchange.HTTP_METHOD, constant("GET"))
                 .setHeader(Exchange.HTTP_QUERY,
                         simple(new StringBuilder().append(PAYEE_IDENTITY).append("=${exchangeProperty.").append(PAYEE_IDENTITY).append("}&")
