@@ -92,7 +92,8 @@ public class RedeemVoucherService {
     }
 
     @Async("asyncExecutor")
-    public void redeemAndPay(RedeemVoucherRequestDTO redeemVoucherRequestDTO, String callbackURL, String registeringInstitutionId, Boolean isExternalLookup) {
+    public void redeemAndPay(RedeemVoucherRequestDTO redeemVoucherRequestDTO, String callbackURL, String registeringInstitutionId,
+            Boolean isExternalLookup) {
         try {
             String voucherNumber = encryptionService.decrypt(redeemVoucherRequestDTO.getVoucherSecretNumber());
             Voucher voucher = voucherRepository.findByVoucherNo(SecurityUtil.hash(voucherNumber))

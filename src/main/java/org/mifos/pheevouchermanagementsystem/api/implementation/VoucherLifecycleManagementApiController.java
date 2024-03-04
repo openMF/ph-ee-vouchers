@@ -37,7 +37,8 @@ public class VoucherLifecycleManagementApiController implements VoucherLifecycle
 
     @Override
     public <T> ResponseEntity<T> voucherStatusChange(String callbackURL, String registeringInstitutionId, String programId,
-            Object requestBody, String command, Boolean isExternalLookup) throws ExecutionException, InterruptedException, JsonProcessingException {
+            Object requestBody, String command, Boolean isExternalLookup)
+            throws ExecutionException, InterruptedException, JsonProcessingException {
         RequestDTO requestDTO = null;
         RedeemVoucherRequestDTO redeemVoucherRequestDTO = null;
         try {
@@ -79,7 +80,7 @@ public class VoucherLifecycleManagementApiController implements VoucherLifecycle
                 voucherLifecycleService.cancelVoucher(requestDTO, callbackURL, registeringInstitutionId);
             } else if (command.equals("redeemPay")) {
                 redeemVoucherRequestDTO = objectMapper.convertValue(requestBody, RedeemVoucherRequestDTO.class);
-                if(isExternalLookup.equals(null)) {
+                if (isExternalLookup.equals(null)) {
                     isExternalLookup = Boolean.TRUE;
                 }
                 PhErrorDTO phErrorDTO = voucherValidator.validateRedeemVoucher(redeemVoucherRequestDTO);

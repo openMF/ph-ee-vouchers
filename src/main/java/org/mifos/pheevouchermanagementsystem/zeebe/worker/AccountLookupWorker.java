@@ -80,7 +80,7 @@ public class AccountLookupWorker extends BaseWorker {
             // exchange.setProperty("paymentModality", existingVariables.get("paymentModality").toString());
             producerTemplate.send("direct:send-account-lookup", exchange);
 
-            existingVariables.put("statusCode",exchange.getIn().getHeader("CamelHttpResponseCode"));
+            existingVariables.put("statusCode", exchange.getIn().getHeader("CamelHttpResponseCode"));
             logger.info((existingVariables.get("statusCode").toString()));
             client.newCompleteCommand(job.getKey()).variables(existingVariables).send();
         }).name("payee-account-Lookup-voucher").maxJobsActive(workerMaxJobs).open();
