@@ -93,7 +93,9 @@ public class AccountLookupWorker extends BaseWorker {
             if (exchange.getIn().getHeader("CamelHttpResponseCode").toString().equals("200")) {
                 AccountLookupResponseDTO accountLookupResponseDTO = null;
 
-                accountLookupResponseDTO = objectMapper.readValue(exchange.getIn().getBody().toString(), AccountLookupResponseDTO.class);
+                String response = exchange.getIn().getBody(String.class);
+
+                accountLookupResponseDTO = objectMapper.readValue(response, AccountLookupResponseDTO.class);
                 existingVariables.put(ACCOUNT_LOOKUP_FAILED, false);
                 existingVariables.put(PAYEE_PARTY_ID, accountLookupResponseDTO.getPaymentModalityList().get(0).getFinancialAddress());
                 existingVariables.put(PAYEE_PARTY_ID_TYPE,
