@@ -1,7 +1,11 @@
 package org.mifos.pheevouchermanagementsystem.zeebe.worker;
 
 import static org.mifos.connector.common.zeebe.ZeebeVariables.TRANSACTION_ID;
-import static org.mifos.pheevouchermanagementsystem.camel.config.CamelProperties.PAYEE_PARTY_ID;import static org.mifos.pheevouchermanagementsystem.camel.config.CamelProperties.PAYEE_PARTY_ID_TYPE;import static org.mifos.pheevouchermanagementsystem.util.PaymentModalityEnum.getKeyByValue;import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.ACCOUNT_LOOKUP_FAILED;import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.CACHED_TRANSACTION_ID;
+import static org.mifos.pheevouchermanagementsystem.camel.config.CamelProperties.PAYEE_PARTY_ID;
+import static org.mifos.pheevouchermanagementsystem.camel.config.CamelProperties.PAYEE_PARTY_ID_TYPE;
+import static org.mifos.pheevouchermanagementsystem.util.PaymentModalityEnum.getKeyByValue;
+import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.ACCOUNT_LOOKUP_FAILED;
+import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.CACHED_TRANSACTION_ID;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.CALLBACK;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.HOST;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.INITIATOR_FSP_ID;
@@ -12,7 +16,8 @@ import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.PAYER_I
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.PAYMENT_MODALITY;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.REGISTERING_INSTITUTION_ID;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.REQUEST_ID;
-import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.TENANT_ID;import static org.mifos.pheevouchermanagementsystem.zeebe.worker.Worker.ACCOUNT_LOOKUP;
+import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.TENANT_ID;
+import static org.mifos.pheevouchermanagementsystem.zeebe.worker.Worker.ACCOUNT_LOOKUP;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.camunda.zeebe.client.ZeebeClient;
@@ -21,7 +26,8 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.support.DefaultExchange;
-import org.mifos.pheevouchermanagementsystem.camel.config.CamelProperties;import org.mifos.pheevouchermanagementsystem.data.AccountLookupResponseDTO;import org.slf4j.Logger;
+import org.mifos.pheevouchermanagementsystem.data.AccountLookupResponseDTO;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -84,7 +90,7 @@ public class AccountLookupWorker extends BaseWorker {
 
             logger.info((existingVariables.get("statusCode").toString()));
 
-            if(exchange.getIn().getHeader("CamelHttpResponseCode").toString().equals("200")) {
+            if (exchange.getIn().getHeader("CamelHttpResponseCode").toString().equals("200")) {
                 AccountLookupResponseDTO accountLookupResponseDTO = null;
 
                 accountLookupResponseDTO = objectMapper.readValue(exchange.getIn().getBody().toString(), AccountLookupResponseDTO.class);
