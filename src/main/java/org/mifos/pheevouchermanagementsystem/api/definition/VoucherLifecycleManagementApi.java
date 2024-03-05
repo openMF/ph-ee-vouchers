@@ -19,6 +19,7 @@ public interface VoucherLifecycleManagementApi {
             @RequestHeader(value = "X-Registering-Institution-ID") String registeringInstitutionId,
             @RequestHeader(value = "X-Program-ID", required = false) String programId, @RequestBody Object requestBody,
             @RequestParam(value = "command") String command,
-            @RequestHeader(value = "isExternalLookup", required = false) Boolean isExternalLookup)
+            @RequestHeader(value = "isExternalLookup", required = false) Boolean isExternalLookup,
+            @RequestHeader(value = "paymentAdvice", required = false) Boolean paymentAdvice)
             throws ExecutionException, InterruptedException, JsonProcessingException, JsonProcessingException;
 }

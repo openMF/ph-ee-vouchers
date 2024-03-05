@@ -93,7 +93,7 @@ public class RedeemVoucherService {
 
     @Async("asyncExecutor")
     public void redeemAndPay(RedeemVoucherRequestDTO redeemVoucherRequestDTO, String callbackURL, String registeringInstitutionId,
-            Boolean isExternalLookup) {
+            Boolean isExternalLookup, Boolean paymentAdvice) {
         try {
             String voucherNumber = encryptionService.decrypt(redeemVoucherRequestDTO.getVoucherSecretNumber());
             Voucher voucher = voucherRepository.findByVoucherNo(SecurityUtil.hash(voucherNumber))
@@ -116,6 +116,7 @@ public class RedeemVoucherService {
             extraVariables.put("currency", voucher.getCurrency());
             extraVariables.put("voucherSerialNumber", redeemVoucherRequestDTO.getVoucherSecretNumber());
             extraVariables.put("isExternalLookup", isExternalLookup);
+            extraVariables.put("paymentAdvice", paymentAdvice);
             zeebeProcessStarter.startZeebeWorkflow("redeem_and_pay_voucher", null, extraVariables);
         } catch (RuntimeException | NoSuchPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException | BadPaddingException
                 | InvalidKeySpecException | InvalidKeyException e) {
