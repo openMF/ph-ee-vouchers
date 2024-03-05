@@ -2,6 +2,7 @@ package org.mifos.pheevouchermanagementsystem.zeebe.worker;
 
 import static org.mifos.pheevouchermanagementsystem.util.RedemptionStatusEnum.SUCCESS;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.PAYMENT_ADVICE;
+import static org.mifos.pheevouchermanagementsystem.zeebe.worker.Worker.VOUCHER_STATUS_SEND_CALLBACK;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.camunda.zeebe.client.ZeebeClient;
@@ -25,7 +26,7 @@ public class SendCallbackWorker {
 
     @PostConstruct
     public void setup() {
-        zeebeClient.newWorker().jobType("send-callback").handler((client, job) -> {
+        zeebeClient.newWorker().jobType(VOUCHER_STATUS_SEND_CALLBACK.getValue()).handler((client, job) -> {
             logger.info("Job '{}' started from process '{}' with key {}", job.getType(), job.getBpmnProcessId(), job.getKey());
 
             Map<String, Object> existingVariables = job.getVariablesAsMap();
@@ -49,6 +50,6 @@ public class SendCallbackWorker {
             }
 
             client.newCompleteCommand(job.getKey()).variables(existingVariables).send();
-        }).name("send-callback").open();
+        }).name(VOUCHER_STATUS_SEND_CALLBACK.getValue()).open();
     }
 }
