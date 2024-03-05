@@ -85,7 +85,7 @@ public class CheckTransferStatusWorker {
                         existingVariables.put(RETRY, retry);
                     }
                 }
-                logger.info("Status: ", status);
+
                 if (status != null) {
                     if (!status.equals("COMPLETED")) {
                         try {
