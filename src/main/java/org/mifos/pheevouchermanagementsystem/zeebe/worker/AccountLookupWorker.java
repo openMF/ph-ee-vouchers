@@ -9,7 +9,6 @@ import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.CACHED_
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.CALLBACK;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.HOST;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.INITIATOR_FSP_ID;
-import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.IS_EXTERNAL_LOOKUP;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.PARTY_LOOKUP_FSP_ID;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.PAYEE_IDENTITY;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.PAYER_IDENTIFIER;
@@ -83,7 +82,6 @@ public class AccountLookupWorker extends BaseWorker {
             exchange.setProperty(REGISTERING_INSTITUTION_ID, existingVariables.get("registeringInstitutionId").toString());
             exchange.setProperty(PAYEE_IDENTITY, existingVariables.get("payeeIdentity").toString());
             exchange.setProperty(PAYMENT_MODALITY, paymentModality);
-            exchange.setProperty(IS_EXTERNAL_LOOKUP, existingVariables.get(IS_EXTERNAL_LOOKUP));
             // exchange.setProperty("paymentModality", existingVariables.get("paymentModality").toString());
             producerTemplate.send("direct:send-account-lookup", exchange);
 
