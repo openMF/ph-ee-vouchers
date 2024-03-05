@@ -23,5 +23,6 @@ public final class ZeebeVariables {
     public static final String TRANSACTION_COMPLETED = "transactionCompleted";
     public static final String IS_EXTERNAL_LOOKUP = "isExternalLookup";
     public static final String PARTY_LOOKUP_FSP_ID = "partyLookupFspId";
+    public static final String PAYMENT_ADVICE = "paymentAdvice";
 
 }
