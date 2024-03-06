@@ -1,5 +1,6 @@
 package org.mifos.pheevouchermanagementsystem.zeebe.worker;
 
+import static org.mifos.pheevouchermanagementsystem.util.RedemptionStatusEnum.SUCCESS;
 import static org.mifos.pheevouchermanagementsystem.util.VoucherStatusEnum.ACTIVE;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.MAX_RETRY;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.RETRY;
