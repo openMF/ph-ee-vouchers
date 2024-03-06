@@ -3,9 +3,7 @@ package org.mifos.pheevouchermanagementsystem.api.implementation;
 import static org.mifos.pheevouchermanagementsystem.util.VoucherManagementEnum.FAILED_RESPONSE;
 import static org.mifos.pheevouchermanagementsystem.util.VoucherManagementEnum.SUCCESS_RESPONSE;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.concurrent.ExecutionException;
 import org.mifos.connector.common.channel.dto.PhErrorDTO;
 import org.mifos.pheevouchermanagementsystem.api.definition.VoucherLifecycleManagementApi;
 import org.mifos.pheevouchermanagementsystem.data.RedeemVoucherRequestDTO;
@@ -37,7 +35,7 @@ public class VoucherLifecycleManagementApiController implements VoucherLifecycle
 
     @Override
     public <T> ResponseEntity<T> voucherStatusChange(String callbackURL, String registeringInstitutionId, String programId,
-            Object requestBody, String command) throws ExecutionException, InterruptedException, JsonProcessingException {
+            Object requestBody, String command) {
         RequestDTO requestDTO = null;
         RedeemVoucherRequestDTO redeemVoucherRequestDTO = null;
         try {
@@ -79,6 +77,7 @@ public class VoucherLifecycleManagementApiController implements VoucherLifecycle
                 voucherLifecycleService.cancelVoucher(requestDTO, callbackURL, registeringInstitutionId);
             } else if (command.equals("redeemPay")) {
                 redeemVoucherRequestDTO = objectMapper.convertValue(requestBody, RedeemVoucherRequestDTO.class);
+
                 PhErrorDTO phErrorDTO = voucherValidator.validateRedeemVoucher(redeemVoucherRequestDTO);
                 if (phErrorDTO != null) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body((T) phErrorDTO);

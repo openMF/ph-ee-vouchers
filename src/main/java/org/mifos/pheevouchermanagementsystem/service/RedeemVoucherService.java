@@ -28,6 +28,7 @@ import org.mifos.pheevouchermanagementsystem.zeebe.ZeebeProcessStarter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +40,9 @@ public class RedeemVoucherService {
     private static final Logger logger = LoggerFactory.getLogger(RedeemVoucherService.class);
     @Autowired
     ZeebeProcessStarter zeebeProcessStarter;
+
+    @Value("${paymentAdvice}")
+    Boolean paymentAdvice;
 
     @Autowired
     EncryptionService encryptionService;
@@ -114,6 +118,7 @@ public class RedeemVoucherService {
             extraVariables.put("amount", voucher.getAmount());
             extraVariables.put("currency", voucher.getCurrency());
             extraVariables.put("voucherSerialNumber", redeemVoucherRequestDTO.getVoucherSecretNumber());
+            extraVariables.put("paymentAdvice", paymentAdvice);
             zeebeProcessStarter.startZeebeWorkflow("redeem_and_pay_voucher", null, extraVariables);
         } catch (RuntimeException | NoSuchPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException | BadPaddingException
                 | InvalidKeySpecException | InvalidKeyException e) {

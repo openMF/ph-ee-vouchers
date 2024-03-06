@@ -1,16 +1,22 @@
 package org.mifos.pheevouchermanagementsystem.zeebe.worker;
 
 import static org.mifos.connector.common.zeebe.ZeebeVariables.TRANSACTION_ID;
+import static org.mifos.pheevouchermanagementsystem.camel.config.CamelProperties.PAYEE_PARTY_ID;
+import static org.mifos.pheevouchermanagementsystem.camel.config.CamelProperties.PAYEE_PARTY_ID_TYPE;
+import static org.mifos.pheevouchermanagementsystem.util.PaymentModalityEnum.getKeyByValue;
+import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.ACCOUNT_LOOKUP_FAILED;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.CACHED_TRANSACTION_ID;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.CALLBACK;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.HOST;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.INITIATOR_FSP_ID;
+import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.PARTY_LOOKUP_FSP_ID;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.PAYEE_IDENTITY;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.PAYER_IDENTIFIER;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.PAYER_IDENTIFIER_TYPE;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.PAYMENT_MODALITY;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.REGISTERING_INSTITUTION_ID;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.REQUEST_ID;
+import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.TENANT_ID;
 import static org.mifos.pheevouchermanagementsystem.zeebe.worker.Worker.ACCOUNT_LOOKUP;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,6 +26,7 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.support.DefaultExchange;
+import org.mifos.pheevouchermanagementsystem.data.AccountLookupResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,6 +84,25 @@ public class AccountLookupWorker extends BaseWorker {
             exchange.setProperty(PAYMENT_MODALITY, paymentModality);
             // exchange.setProperty("paymentModality", existingVariables.get("paymentModality").toString());
             producerTemplate.send("direct:send-account-lookup", exchange);
+
+            existingVariables.put("statusCode", exchange.getIn().getHeader("CamelHttpResponseCode"));
+
+            logger.info((existingVariables.get("statusCode").toString()));
+
+            if (exchange.getIn().getHeader("CamelHttpResponseCode").toString().equals("200")) {
+                AccountLookupResponseDTO accountLookupResponseDTO = null;
+
+                String response = exchange.getIn().getBody(String.class);
+
+                accountLookupResponseDTO = objectMapper.readValue(response, AccountLookupResponseDTO.class);
+                existingVariables.put(ACCOUNT_LOOKUP_FAILED, false);
+                existingVariables.put(PAYEE_PARTY_ID, accountLookupResponseDTO.getPaymentModalityList().get(0).getFinancialAddress());
+                existingVariables.put(PAYEE_PARTY_ID_TYPE,
+                        getKeyByValue(accountLookupResponseDTO.getPaymentModalityList().get(0).getPaymentModality()));
+                existingVariables.put(TENANT_ID, accountLookupResponseDTO.getPaymentModalityList().get(0).getBankingInstitutionCode());
+                existingVariables.put(PARTY_LOOKUP_FSP_ID,
+                        accountLookupResponseDTO.getPaymentModalityList().get(0).getBankingInstitutionCode());
+            }
 
             client.newCompleteCommand(job.getKey()).variables(existingVariables).send();
         }).name("payee-account-Lookup-voucher").maxJobsActive(workerMaxJobs).open();

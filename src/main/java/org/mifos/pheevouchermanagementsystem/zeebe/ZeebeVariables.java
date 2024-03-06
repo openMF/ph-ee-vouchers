@@ -21,5 +21,6 @@ public final class ZeebeVariables {
     public static final String RETRY = "retry";
     public static final String THRESHOLD_DELAY = "thresholdDelay";
     public static final String TRANSACTION_COMPLETED = "transactionCompleted";
+    public static final String PARTY_LOOKUP_FSP_ID = "partyLookupFspId";
 
 }

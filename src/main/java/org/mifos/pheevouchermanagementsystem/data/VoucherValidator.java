@@ -128,12 +128,12 @@ public class VoucherValidator {
             request.setVoucherInstructions(new ArrayList<>(Arrays.asList(new VoucherInstruction())));
         }
 
-//        request.getVoucherInstructions().forEach(voucherInstruction -> {
-//            // Check for serialNumber
-//            validatorBuilder.reset().resource(resource).parameter(serialNumber).value(voucherInstruction.getSerialNumber())
-//                    .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_SERIAL_NUMBER).validateFieldMaxLengthWithFailureCodeAndErrorParams(
-//                            expectedSerialNumberLength, VoucherValidatorsEnum.INVALID_SERIAL_NUMBER_LENGTH);
-//        });
+        // request.getVoucherInstructions().forEach(voucherInstruction -> {
+        // // Check for serialNumber
+        // validatorBuilder.reset().resource(resource).parameter(serialNumber).value(voucherInstruction.getSerialNumber())
+        // .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_SERIAL_NUMBER).validateFieldMaxLengthWithFailureCodeAndErrorParams(
+        // expectedSerialNumberLength, VoucherValidatorsEnum.INVALID_SERIAL_NUMBER_LENGTH);
+        // });
 
         // If errors exist, build and return PhErrorDTO
         if (validatorBuilder.hasError()) {
@@ -164,11 +164,11 @@ public class VoucherValidator {
                 .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_AGENT_ID)
                 .validateFieldMaxLengthWithFailureCodeAndErrorParams(expectedAgentIDLength, VoucherValidatorsEnum.INVALID_AGENT_ID_LENGTH);
 
-//        // Check for voucherSecretNumber
-//        validatorBuilder.reset().resource(resource).parameter(voucherSecretNumber).value(request.getVoucherSecretNumber())
-//                .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_VOUCHER_SECRET_NUMBER)
-//                .validateFieldNotBlankAndLengthWithFailureCodeAndErrorParams(expectedVoucherSecretNumberLength,
-//                        VoucherValidatorsEnum.INVALID_VOUCHER_SECRET_NUMBER_LENGTH);
+        // // Check for voucherSecretNumber
+        // validatorBuilder.reset().resource(resource).parameter(voucherSecretNumber).value(request.getVoucherSecretNumber())
+        // .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_VOUCHER_SECRET_NUMBER)
+        // .validateFieldNotBlankAndLengthWithFailureCodeAndErrorParams(expectedVoucherSecretNumberLength,
+        // VoucherValidatorsEnum.INVALID_VOUCHER_SECRET_NUMBER_LENGTH);
 
         // If errors exist, build and return PhErrorDTO
         if (validatorBuilder.hasError()) {

@@ -83,3 +83,5 @@ management:
 defaultPaymentModality: "01"
 maxRetry: 3
 thresholdDelay: "PT2S"
+
+paymentAdvice: false
