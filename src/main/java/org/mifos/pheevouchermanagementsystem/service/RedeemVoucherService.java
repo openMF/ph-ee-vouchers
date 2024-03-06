@@ -119,6 +119,7 @@ public class RedeemVoucherService {
                 extraVariables.put("amount", voucher.getAmount());
                 extraVariables.put("currency", voucher.getCurrency());
                 extraVariables.put("voucherSerialNumber", redeemVoucherRequestDTO.getVoucherSecretNumber());
+                extraVariables.put("paymentAdvice", paymentAdvice);
                 zeebeProcessStarter.startZeebeWorkflow("redeem_and_pay_voucher", null, extraVariables);
             } else {
                 RedeemVoucherResponseDTO redeemVoucherResponseDTO = new RedeemVoucherResponseDTO(FAILURE.getValue(),
@@ -129,16 +130,6 @@ public class RedeemVoucherService {
                 String body = objectMapper.writeValueAsString(redeemVoucherResponseDTO);
                 sendCallbackService.sendCallback(body, callbackURL);
             }
-            Map<String, Object> extraVariables = new HashMap<>();
-            extraVariables.put("payeeIdentity", voucher.getPayeeFunctionalId());
-            // extraVariables.put("paymentModality", redeemVoucherRequestDTO.getPaymentModality());
-            extraVariables.put("registeringInstitutionId", registeringInstitutionId);
-            extraVariables.put("callbackURL", callbackURL);
-            extraVariables.put("amount", voucher.getAmount());
-            extraVariables.put("currency", voucher.getCurrency());
-            extraVariables.put("voucherSerialNumber", redeemVoucherRequestDTO.getVoucherSecretNumber());
-            extraVariables.put("paymentAdvice", paymentAdvice);
-            zeebeProcessStarter.startZeebeWorkflow("redeem_and_pay_voucher", null, extraVariables);
         } catch (RuntimeException | NoSuchPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException | BadPaddingException
                 | InvalidKeySpecException | InvalidKeyException | JsonProcessingException e) {
             logger.error(e.getMessage());
