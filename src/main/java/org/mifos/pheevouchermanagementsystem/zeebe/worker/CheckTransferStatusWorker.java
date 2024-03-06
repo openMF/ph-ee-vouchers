@@ -6,25 +6,18 @@ import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.RETRY;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.THRESHOLD_DELAY;
 import static org.mifos.pheevouchermanagementsystem.zeebe.ZeebeVariables.TRANSACTION_COMPLETED;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.camunda.zeebe.client.ZeebeClient;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.specification.RequestSpecification;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Map;
 import javax.annotation.PostConstruct;
-import org.apache.camel.CamelContext;
-import org.apache.camel.ProducerTemplate;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.mifos.pheevouchermanagementsystem.data.RedeemVoucherResponseDTO;
 import org.mifos.pheevouchermanagementsystem.domain.Voucher;
 import org.mifos.pheevouchermanagementsystem.exception.VoucherNotFoundException;
 import org.mifos.pheevouchermanagementsystem.repository.VoucherRepository;
-import org.mifos.pheevouchermanagementsystem.service.SendCallbackService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,12 +30,6 @@ public class CheckTransferStatusWorker {
     @Autowired
     private ZeebeClient zeebeClient;
 
-    @Autowired
-    private ProducerTemplate producerTemplate;
-    @Autowired
-    private CamelContext camelContext;
-    @Autowired
-    private ObjectMapper objectMapper;
     @Value("${operations.hostname}")
     private String operationHostname;
     @Value("${operations.endpoints.transfers}")
@@ -51,9 +38,6 @@ public class CheckTransferStatusWorker {
     private int maxRetry;
     @Value("${thresholdDelay}")
     private String thresholdDelay;
-
-    @Autowired
-    private SendCallbackService sendCallbackService;
 
     @Autowired
     private VoucherRepository voucherRepository;
@@ -101,7 +85,7 @@ public class CheckTransferStatusWorker {
                         existingVariables.put(RETRY, retry);
                     }
                 }
-                logger.info("Status: ", status);
+
                 if (status != null) {
                     if (!status.equals("COMPLETED")) {
                         try {
@@ -118,13 +102,7 @@ public class CheckTransferStatusWorker {
                     }
                     if (status.equals("COMPLETED")) {
                         existingVariables.put(TRANSACTION_COMPLETED, true);
-                        RedeemVoucherResponseDTO redeemVoucherResponseDTO = new RedeemVoucherResponseDTO(status,
-                                "Voucher redemption successful", existingVariables.get("voucherSerialNumber").toString(), null,
-                                LocalDateTime.now(ZoneId.systemDefault()).toString(), existingVariables.get("transactionId").toString());
-                        ObjectMapper objectMapper = new ObjectMapper();
-                        String body = objectMapper.writeValueAsString(redeemVoucherResponseDTO);
-                        logger.info("Sending callback on URL: {}", existingVariables.get("callbackURL"));
-                        sendCallbackService.sendCallback(body, existingVariables.get("callbackURL").toString());
+                        existingVariables.put("status", status);
                     }
                 }
                 logger.info("Updating status zeebe variable");
