@@ -33,7 +33,6 @@ public class SendCallbackWorker extends BaseWorker {
 
             Map<String, Object> existingVariables = job.getVariablesAsMap();
             if (existingVariables.get(PAYMENT_ADVICE).equals(true)) {
-                logger.info("Status: {}", existingVariables.get("status").toString());
                 RedeemVoucherResponseDTO redeemVoucherResponseDTO = new RedeemVoucherResponseDTO(SUCCESS.getValue(),
                         "Voucher redemption successful", existingVariables.get("voucherSerialNumber").toString(), null,
                         LocalDateTime.now(ZoneId.systemDefault()).toString(), existingVariables.get("transactionId").toString());
