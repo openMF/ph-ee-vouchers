@@ -6,6 +6,7 @@ import static org.mifos.pheevouchermanagementsystem.util.UniqueIDGenerator.gener
 import static org.mifos.pheevouchermanagementsystem.util.VoucherStatusEnum.ACTIVE;
 import static org.mifos.pheevouchermanagementsystem.util.VoucherStatusEnum.UTILIZED;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -46,6 +47,8 @@ public class RedeemVoucherService {
 
     @Autowired
     EncryptionService encryptionService;
+    @Autowired
+    SendCallbackService sendCallbackService;
 
     @Autowired
     public RedeemVoucherService(VoucherRepository voucherRepository, ObjectMapper objectMapper) {
@@ -108,20 +111,27 @@ public class RedeemVoucherService {
                     && voucher.getRegisteringInstitutionId().equals(registeringInstitutionId)) {
                 voucher.setStatus(UTILIZED.getValue());
                 voucherRepository.save(voucher);
+                Map<String, Object> extraVariables = new HashMap<>();
+                extraVariables.put("payeeIdentity", voucher.getPayeeFunctionalId());
+                // extraVariables.put("paymentModality", redeemVoucherRequestDTO.getPaymentModality());
+                extraVariables.put("registeringInstitutionId", registeringInstitutionId);
+                extraVariables.put("callbackURL", callbackURL);
+                extraVariables.put("amount", voucher.getAmount());
+                extraVariables.put("currency", voucher.getCurrency());
+                extraVariables.put("voucherSerialNumber", redeemVoucherRequestDTO.getVoucherSecretNumber());
+                extraVariables.put("paymentAdvice", paymentAdvice);
+                zeebeProcessStarter.startZeebeWorkflow("redeem_and_pay_voucher", null, extraVariables);
+            } else {
+                RedeemVoucherResponseDTO redeemVoucherResponseDTO = new RedeemVoucherResponseDTO(FAILURE.getValue(),
+                        "Voucher number Utilized!", redeemVoucherRequestDTO.getVoucherSecretNumber(), "",
+                        LocalDateTime.now(ZoneId.systemDefault()).toString(), null);
 
+                ObjectMapper objectMapper = new ObjectMapper();
+                String body = objectMapper.writeValueAsString(redeemVoucherResponseDTO);
+                sendCallbackService.sendCallback(body, callbackURL);
             }
-            Map<String, Object> extraVariables = new HashMap<>();
-            extraVariables.put("payeeIdentity", voucher.getPayeeFunctionalId());
-            // extraVariables.put("paymentModality", redeemVoucherRequestDTO.getPaymentModality());
-            extraVariables.put("registeringInstitutionId", registeringInstitutionId);
-            extraVariables.put("callbackURL", callbackURL);
-            extraVariables.put("amount", voucher.getAmount());
-            extraVariables.put("currency", voucher.getCurrency());
-            extraVariables.put("voucherSerialNumber", redeemVoucherRequestDTO.getVoucherSecretNumber());
-            extraVariables.put("paymentAdvice", paymentAdvice);
-            zeebeProcessStarter.startZeebeWorkflow("redeem_and_pay_voucher", null, extraVariables);
         } catch (RuntimeException | NoSuchPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException | BadPaddingException
-                | InvalidKeySpecException | InvalidKeyException e) {
+                | InvalidKeySpecException | InvalidKeyException | JsonProcessingException e) {
             logger.error(e.getMessage());
         }
     }
