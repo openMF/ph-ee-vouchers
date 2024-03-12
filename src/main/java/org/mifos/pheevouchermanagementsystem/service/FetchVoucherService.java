@@ -23,7 +23,8 @@ public class FetchVoucherService {
     public FetchVoucherResponseDTO fetchVoucher(String serialNumber, String registeringInstitutionId) {
         Voucher voucher = voucherRepository.findBySerialNo(serialNumber)
                 .orElseThrow(() -> VoucherNotFoundException.voucherNotFound(serialNumber));
-        return new FetchVoucherResponseDTO(serialNumber, voucher.getCreatedDate(), registeringInstitutionId, voucher.getStatus());
+        return new FetchVoucherResponseDTO(serialNumber, voucher.getCreatedDate(), registeringInstitutionId, voucher.getStatus(),
+                voucher.getPayeeFunctionalId());
     }
 
     public Page<FetchVoucherResponseDTO> fetchAllVouchers(String registeringInstitutionId, Integer page, Integer size) {
@@ -31,6 +32,6 @@ public class FetchVoucherService {
         Page<Voucher> voucherPage = voucherRepository.findAll(pageRequest);
 
         return voucherPage.map(voucher -> new FetchVoucherResponseDTO(voucher.getSerialNo(), voucher.getCreatedDate(),
-                registeringInstitutionId, voucher.getStatus()));
+                registeringInstitutionId, voucher.getStatus(), voucher.getPayeeFunctionalId()));
     }
 }
