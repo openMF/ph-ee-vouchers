@@ -16,4 +16,5 @@ public class FetchVoucherResponseDTO {
     private LocalDateTime createdDate;
     private String registeringInstitutionId;
     private String status;
+    private String payeeFunctionalID;
 }

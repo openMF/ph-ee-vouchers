@@ -103,7 +103,8 @@ public class CreateVoucherService {
             batchAuthorization(totalAmount[0], currency, request.getBatchID(), voucherInstructionList, requestID, registeringInstitutionId,
                     callbackURL);
         } catch (InstructionIdException e) {
-            logger.error(e.toString());
+            logger.error("Instruction Id already exist : {}", e.getMessage());
+            throw e;
         }
     }
 

@@ -10,6 +10,7 @@ import org.mifos.connector.common.channel.dto.PhErrorDTO;
 import org.mifos.pheevouchermanagementsystem.api.definition.CreateVoucherApi;
 import org.mifos.pheevouchermanagementsystem.data.RequestDTO;
 import org.mifos.pheevouchermanagementsystem.data.ResponseDTO;
+import org.mifos.pheevouchermanagementsystem.exception.InstructionIdException;
 import org.mifos.pheevouchermanagementsystem.service.CreateVoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,6 +32,8 @@ public class CreateVoucherApiController implements CreateVoucherApi {
             if (phErrorDTO != null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body((T) phErrorDTO);
             }
+        } catch (InstructionIdException e) {
+            throw e;
         } catch (Exception e) {
             ResponseDTO responseDTO = new ResponseDTO(FAILED_RESPONSE.getValue(), e.getMessage(), requestBody.getRequestID());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body((T) responseDTO);
