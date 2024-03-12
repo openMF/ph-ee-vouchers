@@ -33,7 +33,7 @@ public class CreateVoucherApiController implements CreateVoucherApi {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body((T) phErrorDTO);
             }
         } catch (InstructionIdException e) {
-            throw new InstructionIdException(e.getMessage());
+            throw e;
         } catch (Exception e) {
             ResponseDTO responseDTO = new ResponseDTO(FAILED_RESPONSE.getValue(), e.getMessage(), requestBody.getRequestID());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body((T) responseDTO);
