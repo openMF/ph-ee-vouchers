@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 public interface CreateVoucherApi {
 
     @Operation(summary = "Create Vouchers API")
-    @PostMapping("/vouchers")
+    @PostMapping(value = "/vouchers", params = "!command")
     <T> ResponseEntity<T> createVouchers(@RequestHeader(value = "X-CallbackURL") String callbackURL,
             @RequestHeader(value = "X-Program-ID", required = false) String programId,
             @RequestHeader(value = "X-Registering-Institution-ID") String registeringInstitutionId, @RequestBody RequestDTO requestBody)
