@@ -12,8 +12,8 @@ import lombok.Setter;
 @AllArgsConstructor
 public class VoucherLifecycleCallbackResponseDTO {
 
-    private String requestId;
-    private String registerRequestId;
+    private String requestID;
+    private String registerRequestID;
     private Integer numberFailedCases;
     private List<FailedCaseDTO> failedCases;
 }
