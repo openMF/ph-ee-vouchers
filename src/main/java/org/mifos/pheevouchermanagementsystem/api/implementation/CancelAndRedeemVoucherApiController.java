@@ -40,6 +40,7 @@ public class CancelAndRedeemVoucherApiController implements CancelAndRedeemVouch
             Object requestBody, String command) {
         RequestDTO requestDTO = null;
         RedeemVoucherRequestDTO redeemVoucherRequestDTO = null;
+
         try {
             if (command.equals("redeem")) {
                 redeemVoucherRequestDTO = objectMapper.convertValue(requestBody, RedeemVoucherRequestDTO.class);
