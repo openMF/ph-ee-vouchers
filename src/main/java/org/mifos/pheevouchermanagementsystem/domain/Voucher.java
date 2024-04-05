@@ -48,13 +48,13 @@ public class Voucher {
     @Column(name = "payee_functional_id")
     private String payeeFunctionalId;
 
-    @Column(name = "batch_id")
+    @Column(name = "batch_id", unique = true, nullable = false)
     private String batchId;
 
     @Column(name = "instruction_id", unique = true)
     private String instructionId;
 
-    @Column(name = "request_id", nullable = false)
+    @Column(name = "request_id", unique = true, nullable = false)
     private String requestId;
     @Column(name = "registering_institution_id", nullable = false)
     private String registeringInstitutionId;

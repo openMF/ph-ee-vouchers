@@ -4,6 +4,8 @@ import static org.mifos.pheevouchermanagementsystem.util.VoucherManagementEnum.F
 import static org.mifos.pheevouchermanagementsystem.util.VoucherManagementEnum.SUCCESS_RESPONSE;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.HashMap;
+import java.util.Map;
 import org.mifos.connector.common.channel.dto.PhErrorDTO;
 import org.mifos.pheevouchermanagementsystem.api.definition.CancelAndRedeemVoucherApi;
 import org.mifos.pheevouchermanagementsystem.data.RedeemVoucherRequestDTO;
@@ -55,6 +57,10 @@ public class CancelAndRedeemVoucherApiController implements CancelAndRedeemVouch
                 }
                 voucherLifecycleService.cancelVoucher(requestDTO, callbackURL, registeringInstitutionId);
             }
+        } catch (NullPointerException e) {
+            Map<String, String> responseBody = new HashMap<>();
+            responseBody.put("FailureReason", e.getMessage());
+            return (ResponseEntity<T>) ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseBody);
         } catch (Exception e) {
             ResponseDTO responseDTO = new ResponseDTO(FAILED_RESPONSE.getValue(), FAILED_RESPONSE.getMessage(), requestDTO.getRequestID());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body((T) responseDTO);
