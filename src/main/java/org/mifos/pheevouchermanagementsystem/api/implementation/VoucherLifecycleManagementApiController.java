@@ -6,6 +6,7 @@ import static org.mifos.pheevouchermanagementsystem.util.VoucherManagementEnum.S
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.mifos.connector.common.channel.dto.PhErrorDTO;
 import org.mifos.pheevouchermanagementsystem.api.definition.VoucherLifecycleManagementApi;
 import org.mifos.pheevouchermanagementsystem.data.RedeemVoucherRequestDTO;
@@ -21,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Slf4j
 public class VoucherLifecycleManagementApiController implements VoucherLifecycleManagementApi {
 
     @Autowired
@@ -73,7 +75,8 @@ public class VoucherLifecycleManagementApiController implements VoucherLifecycle
             }
         } catch (NullPointerException e) {
             Map<String, String> responseBody = new HashMap<>();
-            responseBody.put("FailureReason", e.getMessage());
+            log.error("An error occurred : {}", e.getMessage());
+            responseBody.put("FailureReason", "An error occurred contact the system admin !!");
             return (ResponseEntity<T>) ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseBody);
         } catch (Exception e) {
             ResponseDTO responseDTO = new ResponseDTO(FAILED_RESPONSE.getValue(), FAILED_RESPONSE.getMessage(), requestDTO.getRequestID());

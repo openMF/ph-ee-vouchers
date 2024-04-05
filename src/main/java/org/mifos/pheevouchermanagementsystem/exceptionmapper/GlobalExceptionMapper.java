@@ -6,6 +6,7 @@ import static org.mifos.pheevouchermanagementsystem.util.VoucherManagementEnum.P
 
 import java.util.HashMap;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.mifos.pheevouchermanagementsystem.data.ConflictResponseDTO;
 import org.mifos.pheevouchermanagementsystem.data.ResponseDTO;
 import org.mifos.pheevouchermanagementsystem.exception.ConflictingDataException;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionMapper {
 
     @ExceptionHandler(ZeebeClientStatusException.class)
@@ -43,7 +45,8 @@ public class GlobalExceptionMapper {
     @ExceptionHandler(NullPointerException.class)
     public <T> ResponseEntity<T> handleNullPointerException(NullPointerException ex) {
         Map<String, String> responseBody = new HashMap<>();
-        responseBody.put("FailureReason", ex.getMessage());
+        log.error("An error occurred : {}", ex.getMessage());
+        responseBody.put("FailureReason", "An error occurred contact the system admin !!");
         return (ResponseEntity<T>) ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseBody);
     }
 
