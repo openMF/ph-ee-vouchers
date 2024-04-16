@@ -25,9 +25,11 @@ import org.mifos.pheevouchermanagementsystem.data.VoucherInstruction;
 import org.mifos.pheevouchermanagementsystem.data.VoucherValidator;
 import org.mifos.pheevouchermanagementsystem.domain.ErrorTracking;
 import org.mifos.pheevouchermanagementsystem.domain.Voucher;
+import org.mifos.pheevouchermanagementsystem.exception.ConflictingDataException;
 import org.mifos.pheevouchermanagementsystem.exception.InstructionIdException;
 import org.mifos.pheevouchermanagementsystem.repository.ErrorTrackingRepository;
 import org.mifos.pheevouchermanagementsystem.repository.VoucherRepository;
+import org.mifos.pheevouchermanagementsystem.util.VouchersDTOConstant;
 import org.mifos.pheevouchermanagementsystem.zeebe.ZeebeProcessStarter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,6 +73,13 @@ public class CreateVoucherService {
     }
 
     public void createVouchers(RequestDTO request, String callbackURL, String registeringInstitutionId) {
+        try {
+            validateRequestID(request.getRequestID());
+            validateBatchID(request.getBatchID());
+        } catch (ConflictingDataException e) {
+            logger.error(e.getMessage());
+            throw e;
+        }
         List<VoucherInstruction> voucherInstructionList = request.getVoucherInstructions();
         List<ErrorTracking> errorTrackingsList = new ArrayList<>();
         List<SuccessfulVouchers> successfulVouchers = new ArrayList<>();
@@ -81,6 +90,18 @@ public class CreateVoucherService {
          * CallbackRequestDTO(request.getRequestID(), request.getBatchID(), successfulVouchers)), callbackURL); } catch
          * (JsonProcessingException e) { logger.error(e.getMessage()); }
          */
+    }
+
+    public void validateRequestID(String requestID) {
+        if (voucherRepository.existsByRequestId(requestID)) {
+            throw new ConflictingDataException(VouchersDTOConstant.requestID, requestID);
+        }
+    }
+
+    public void validateBatchID(String batchID) {
+        if (voucherRepository.existsByBatchId(batchID)) {
+            throw new ConflictingDataException(VouchersDTOConstant.batchID, batchID);
+        }
     }
 
     public void validateAndSaveVoucher(List<VoucherInstruction> voucherInstructionList, List<SuccessfulVouchers> successfulVouchers,

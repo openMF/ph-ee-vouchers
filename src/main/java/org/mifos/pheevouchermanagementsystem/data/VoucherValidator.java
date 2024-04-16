@@ -4,10 +4,13 @@ import static org.mifos.connector.common.exception.PaymentHubError.ExtValidation
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import org.mifos.connector.common.channel.dto.PhErrorDTO;
 import org.mifos.connector.common.exception.PaymentHubErrorCategory;
 import org.mifos.connector.common.validation.ValidatorBuilder;
 import org.mifos.pheevouchermanagementsystem.util.VoucherValidatorsEnum;
+import org.mifos.pheevouchermanagementsystem.util.VouchersDTOConstant;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -38,8 +41,11 @@ public class VoucherValidator {
     private static final String voucherSecretNumber = "voucherSecretNumber";
     private static final int expectedVoucherSecretNumberLength = 6;
 
+    public UnsupportedParameterValidation unsupportedParameterValidation = new UnsupportedParameterValidation();
+
     public PhErrorDTO validateCreateVoucher(RequestDTO request) {
         final ValidatorBuilder validatorBuilder = new ValidatorBuilder();
+        unsupportedParameterValidation.handleUnsupportedParameterValidation(request.getAdditionalProperties(), validatorBuilder);
 
         // Checks for requestID
         validatorBuilder.reset().resource(resource).parameter(requestId).value(request.getRequestID())
@@ -59,6 +65,10 @@ public class VoucherValidator {
         }
 
         request.getVoucherInstructions().forEach(voucherInstruction -> {
+            // check for unsupported parameters in voucherInstruction
+            unsupportedParameterValidation.handleUnsupportedParameterValidation(voucherInstruction.getAdditionalProperties(),
+                    validatorBuilder);
+
             // Check for instructionID
             validatorBuilder.reset().resource(resource).parameter(instructionID).value(voucherInstruction.getInstructionID())
                     .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_INSTRUCTION_ID)
@@ -111,6 +121,10 @@ public class VoucherValidator {
 
     public PhErrorDTO validateVoucherLifecycle(RequestDTO request) {
         final ValidatorBuilder validatorBuilder = new ValidatorBuilder();
+
+        // check for unsupported parameter
+        unsupportedParameterValidation.handleUnsupportedParameterValidation(request.getAdditionalProperties(), validatorBuilder);
+
         // Checks for requestID
         validatorBuilder.reset().resource(resource).parameter(requestId).value(request.getRequestID())
                 .validateFieldMaxLengthWithFailureCodeAndErrorParams(expectedRequestIdLength,
@@ -128,12 +142,28 @@ public class VoucherValidator {
             request.setVoucherInstructions(new ArrayList<>(Arrays.asList(new VoucherInstruction())));
         }
 
-        // request.getVoucherInstructions().forEach(voucherInstruction -> {
-        // // Check for serialNumber
-        // validatorBuilder.reset().resource(resource).parameter(serialNumber).value(voucherInstruction.getSerialNumber())
-        // .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_SERIAL_NUMBER).validateFieldMaxLengthWithFailureCodeAndErrorParams(
-        // expectedSerialNumberLength, VoucherValidatorsEnum.INVALID_SERIAL_NUMBER_LENGTH);
-        // });
+        Set<String> requiredFields = new HashSet<>();
+        requiredFields.add(VouchersDTOConstant.serialNumber);
+        requiredFields.add(VouchersDTOConstant.status);
+
+        request.getVoucherInstructions().forEach(voucherInstruction -> {
+            // check for unsupported parameters in voucherInstruction
+            unsupportedParameterValidation.handleUnsupportedParameterValidation(voucherInstruction.getAdditionalProperties(),
+                    validatorBuilder);
+
+            // check for only required fields needed from the voucherInstructionDTO
+            try {
+                unsupportedParameterValidation.handleRequiredParameterValidation(voucherInstruction.getNonNullFieldNames(), requiredFields,
+                        validatorBuilder);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+
+            // // Check for serialNumber
+            // validatorBuilder.reset().resource(resource).parameter(serialNumber).value(voucherInstruction.getSerialNumber())
+            // .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_SERIAL_NUMBER).validateFieldMaxLengthWithFailureCodeAndErrorParams(
+            // expectedSerialNumberLength, VoucherValidatorsEnum.INVALID_SERIAL_NUMBER_LENGTH);
+        });
 
         // If errors exist, build and return PhErrorDTO
         if (validatorBuilder.hasError()) {
@@ -153,6 +183,9 @@ public class VoucherValidator {
 
     public PhErrorDTO validateRedeemVoucher(RedeemVoucherRequestDTO request) {
         final ValidatorBuilder validatorBuilder = new ValidatorBuilder();
+
+        // check for unsupported parameter
+        unsupportedParameterValidation.handleUnsupportedParameterValidation(request.getAdditionalProperties(), validatorBuilder);
 
         // Check for requestID
         validatorBuilder.reset().resource(resource).parameter(requestId).value(request.getRequestId())

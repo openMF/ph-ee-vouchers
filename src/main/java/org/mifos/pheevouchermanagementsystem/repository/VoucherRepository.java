@@ -9,6 +9,10 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface VoucherRepository extends JpaRepository<Voucher, Long>, JpaSpecificationExecutor<Voucher> {
 
+    Boolean existsByRequestId(String requestId);
+
+    Boolean existsByBatchId(String batchId);
+
     Boolean existsByInstructionId(String instructionId);
 
     Boolean existsBySerialNo(String serialNo);
