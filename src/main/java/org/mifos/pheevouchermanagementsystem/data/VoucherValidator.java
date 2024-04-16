@@ -147,6 +147,10 @@ public class VoucherValidator {
         requiredFields.add(VouchersDTOConstant.status);
 
         request.getVoucherInstructions().forEach(voucherInstruction -> {
+            // check for unsupported parameters in voucherInstruction
+            unsupportedParameterValidation.handleUnsupportedParameterValidation(voucherInstruction.getAdditionalProperties(),
+                    validatorBuilder);
+
             // check for only required fields needed from the voucherInstructionDTO
             try {
                 unsupportedParameterValidation.handleRequiredParameterValidation(voucherInstruction.getNonNullFieldNames(), requiredFields,
@@ -154,10 +158,6 @@ public class VoucherValidator {
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
-
-            // check for unsupported parameters in voucherInstruction
-            unsupportedParameterValidation.handleUnsupportedParameterValidation(voucherInstruction.getAdditionalProperties(),
-                    validatorBuilder);
 
             // // Check for serialNumber
             // validatorBuilder.reset().resource(resource).parameter(serialNumber).value(voucherInstruction.getSerialNumber())

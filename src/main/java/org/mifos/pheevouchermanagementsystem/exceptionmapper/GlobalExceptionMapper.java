@@ -46,7 +46,7 @@ public class GlobalExceptionMapper {
     public <T> ResponseEntity<T> handleNullPointerException(NullPointerException ex) {
         Map<String, String> responseBody = new HashMap<>();
         log.error("An error occurred : {}", ex.getMessage());
-        responseBody.put("FailureReason", "An error occurred contact the system admin !!");
+        responseBody.put("FailureReason", "An error occurred, contact the system admin !!");
         return (ResponseEntity<T>) ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseBody);
     }
 

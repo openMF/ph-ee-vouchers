@@ -62,7 +62,7 @@ public class CancelAndRedeemVoucherApiController implements CancelAndRedeemVouch
         } catch (NullPointerException e) {
             Map<String, String> responseBody = new HashMap<>();
             log.error("An error occurred : {}", e.getMessage());
-            responseBody.put("FailureReason", "An error occurred contact the system admin !!");
+            responseBody.put("FailureReason", "An error occurred, contact the system admin !!");
             return (ResponseEntity<T>) ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseBody);
         } catch (Exception e) {
             ResponseDTO responseDTO = new ResponseDTO(FAILED_RESPONSE.getValue(), FAILED_RESPONSE.getMessage(), requestDTO.getRequestID());
