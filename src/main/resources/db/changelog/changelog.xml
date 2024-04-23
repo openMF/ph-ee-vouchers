@@ -4,4 +4,5 @@
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.5.xsd">
     <include file="/01-create-voucher-table.xml" relativeToChangelogFile="true"/>
     <include file="/02-create-error-table.xml" relativeToChangelogFile="true"/>
+    <include file="/03-alter-voucher-table.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
