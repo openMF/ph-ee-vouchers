@@ -27,8 +27,8 @@ public class FetchVoucherApiController implements FetchVoucherApi {
     }
 
     @Override
-    @ValidateHeaders(requiredHeaders = { HeaderConstants.X_REGISTERING_INSTITUTION_ID}, validatorClass = HeaderValidator.class,
-            validationFunction = "validateForRegisteringInstitutionID")
+    @ValidateHeaders(requiredHeaders = {
+            HeaderConstants.X_REGISTERING_INSTITUTION_ID }, validatorClass = HeaderValidator.class, validationFunction = "validateForRegisteringInstitutionID")
     public ResponseEntity<FetchVoucherResponseDTO> fetchVoucher(String serialNumber, String registeringInstitutionId)
             throws ExecutionException, InterruptedException {
         if (registeringInstitutionId == null || registeringInstitutionId.isEmpty() || !voucherRepository.existsBySerialNo(serialNumber)) {
@@ -39,8 +39,8 @@ public class FetchVoucherApiController implements FetchVoucherApi {
     }
 
     @Override
-    @ValidateHeaders(requiredHeaders = { HeaderConstants.X_REGISTERING_INSTITUTION_ID}, validatorClass = HeaderValidator.class,
-            validationFunction = "validateForRegisteringInstitutionID")
+    @ValidateHeaders(requiredHeaders = {
+            HeaderConstants.X_REGISTERING_INSTITUTION_ID }, validatorClass = HeaderValidator.class, validationFunction = "validateForRegisteringInstitutionID")
     public ResponseEntity<Page<FetchVoucherResponseDTO>> fetchAllVouchers(String registeringInstitutionId, Integer page, Integer size)
             throws ExecutionException, InterruptedException {
         if (registeringInstitutionId == null || registeringInstitutionId.isEmpty()) {
