@@ -6,6 +6,9 @@ import org.mifos.pheevouchermanagementsystem.data.FetchVoucherResponseDTO;
 import org.mifos.pheevouchermanagementsystem.data.VoucherStatusResponseDTO;
 import org.mifos.pheevouchermanagementsystem.repository.VoucherRepository;
 import org.mifos.pheevouchermanagementsystem.service.FetchVoucherService;
+import org.mifos.pheevouchermanagementsystem.service.ValidateHeaders;
+import org.mifos.pheevouchermanagementsystem.util.HeaderConstants;
+import org.mifos.pheevouchermanagementsystem.validator.HeaderValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +27,8 @@ public class VoucherStatusApiController implements VoucherStatusApi {
     }
 
     @Override
+    @ValidateHeaders(requiredHeaders = {
+            HeaderConstants.X_REGISTERING_INSTITUTION_ID }, validatorClass = HeaderValidator.class, validationFunction = "validateForRegisteringInstitutionID")
     public ResponseEntity<VoucherStatusResponseDTO> voucherStatus(String serialNumber, String registeringInstitutionId, String status)
             throws ExecutionException, InterruptedException {
         if (registeringInstitutionId == null || registeringInstitutionId.isEmpty() || !voucherRepository.existsBySerialNo(serialNumber)) {

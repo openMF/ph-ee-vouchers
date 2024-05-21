@@ -1,18 +1,16 @@
 package org.mifos.pheevouchermanagementsystem.interceptor;
 
-import static org.mifos.connector.common.exception.PaymentHubError.ExtValidationError;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.mifos.connector.common.channel.dto.PhErrorDTO;
-import org.mifos.connector.common.exception.PaymentHubErrorCategory;
-import org.mifos.connector.common.validation.ValidatorBuilder;
-import org.mifos.pheevouchermanagementsystem.api.implementation.CreateVoucherApiController;
-import org.mifos.pheevouchermanagementsystem.api.implementation.VoucherLifecycleManagementApiController;
-import org.mifos.pheevouchermanagementsystem.util.VoucherValidatorsEnum;
+import org.mifos.pheevouchermanagementsystem.service.ValidateHeaders;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
@@ -22,91 +20,53 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Component
 public class ValidatorInterceptor implements HandlerInterceptor {
 
-    private static final String resource = "ValidatorInterceptor";
-    private static final String callbackURL = "X-CallbackURL";
-    private static final String registeringInstitutionId = "X-Registering-Institution-ID";
+    @Autowired
+    private ApplicationContext applicationContext;
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
-        log.debug("request at interceptor");
-
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        log.debug("At interceptor");
         if (handler instanceof HandlerMethod) {
             HandlerMethod handlerMethod = (HandlerMethod) handler;
+            Method method = handlerMethod.getMethod();
+            if (method.isAnnotationPresent(ValidateHeaders.class)) {
+                ValidateHeaders validateHeaders = method.getAnnotation(ValidateHeaders.class);
+                Set<String> headersSet = extractRequiredHeaders(validateHeaders);
 
-            if (handlerMethod.getBeanType().equals(CreateVoucherApiController.class)) {
+                Object validatorInstance = getValidatorInstance(validateHeaders);
 
-                // Using ValidatorBuilder for header validation
-                final ValidatorBuilder validatorBuilder = new ValidatorBuilder();
-                validatorBuilder.reset().resource(resource).parameter(callbackURL).value(request.getHeader(callbackURL))
-                        .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_CALLBACK_URL);
+                Object methodResponse = invokeValidationMethod(validateHeaders, validatorInstance, headersSet, request);
 
-                validatorBuilder.reset().resource(resource).parameter(registeringInstitutionId)
-                        .value(request.getHeader(registeringInstitutionId))
-                        .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_REGISTERING_INSTITUTION_ID);
-
-                // If errors exist, set the response and return false
-                if (validatorBuilder.hasError()) {
-                    validatorBuilder.errorCategory(PaymentHubErrorCategory.Validation.toString())
-                            .errorCode(VoucherValidatorsEnum.VOUCHER_HEADER_VALIDATION_ERROR.getCode())
-                            .errorDescription(VoucherValidatorsEnum.VOUCHER_HEADER_VALIDATION_ERROR.getMessage())
-                            .developerMessage(VoucherValidatorsEnum.VOUCHER_HEADER_VALIDATION_ERROR.getMessage())
-                            .defaultUserMessage(VoucherValidatorsEnum.VOUCHER_HEADER_VALIDATION_ERROR.getMessage());
-
-                    PhErrorDTO.PhErrorDTOBuilder phErrorDTOBuilder = new PhErrorDTO.PhErrorDTOBuilder(ExtValidationError.getErrorCode());
-                    phErrorDTOBuilder.fromValidatorBuilder(validatorBuilder);
-
-                    // Converting PHErrorDTO in JSON Format
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    String jsonResponse = objectMapper.writeValueAsString(phErrorDTOBuilder.build());
-
-                    // Setting response status and writing the error message
-                    response.setHeader("Content-Type", "application/json");
-                    response.setStatus(HttpStatus.BAD_REQUEST.value());
-                    response.getWriter().write(jsonResponse);
-
-                    return false;
-                }
-            } else if (handlerMethod.getBeanType().equals(VoucherLifecycleManagementApiController.class)) {
-                // Using ValidatorBuilder for header validation
-                final ValidatorBuilder validatorBuilder = new ValidatorBuilder();
-
-                String command = request.getParameter("command");
-                if (command.equals("activate") || command.equals("cancel")) {
-                    validatorBuilder.reset().resource(resource).parameter(callbackURL).value(request.getHeader(callbackURL))
-                            .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_CALLBACK_URL)
-                            .validateFieldMaxLengthWithFailureCodeAndErrorParams(100, VoucherValidatorsEnum.INVALID_CALLBACK_URL_LENGTH);
-                }
-
-                validatorBuilder.reset().resource(resource).parameter(registeringInstitutionId)
-                        .value(request.getHeader(registeringInstitutionId))
-                        .isNullWithFailureCode(VoucherValidatorsEnum.INVALID_REGISTERING_INSTITUTION_ID)
-                        .validateFieldMaxLengthWithFailureCodeAndErrorParams(20,
-                                VoucherValidatorsEnum.INVALID_REGISTERING_INSTITUTION_ID_LENGTH);
-
-                // If errors exist, set the response and return false
-                if (validatorBuilder.hasError()) {
-                    validatorBuilder.errorCategory(PaymentHubErrorCategory.Validation.toString())
-                            .errorCode(VoucherValidatorsEnum.VOUCHER_HEADER_VALIDATION_ERROR.getCode())
-                            .errorDescription(VoucherValidatorsEnum.VOUCHER_HEADER_VALIDATION_ERROR.getMessage())
-                            .developerMessage(VoucherValidatorsEnum.VOUCHER_HEADER_VALIDATION_ERROR.getMessage())
-                            .defaultUserMessage(VoucherValidatorsEnum.VOUCHER_HEADER_VALIDATION_ERROR.getMessage());
-
-                    PhErrorDTO.PhErrorDTOBuilder phErrorDTOBuilder = new PhErrorDTO.PhErrorDTOBuilder(ExtValidationError.getErrorCode());
-                    phErrorDTOBuilder.fromValidatorBuilder(validatorBuilder);
-
-                    // Converting PHErrorDTO in JSON Format
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    String jsonResponse = objectMapper.writeValueAsString(phErrorDTOBuilder.build());
-
-                    // Setting response status and writing the error message
-                    response.setHeader("Content-Type", "application/json");
-                    response.setStatus(HttpStatus.BAD_REQUEST.value());
-                    response.getWriter().write(jsonResponse);
-
+                if (methodResponse != null) {
+                    handleValidationFailure(response, methodResponse);
                     return false;
                 }
             }
         }
         return true;
+    }
+
+    private Set<String> extractRequiredHeaders(ValidateHeaders validateHeaders) {
+        return Arrays.stream(validateHeaders.requiredHeaders()).map(String::toLowerCase).collect(Collectors.toSet());
+    }
+
+    private Object getValidatorInstance(ValidateHeaders validateHeaders) {
+        return applicationContext.getBean(validateHeaders.validatorClass());
+    }
+
+    private Object invokeValidationMethod(ValidateHeaders validateHeaders, Object validatorInstance, Set<String> headersSet,
+                                          HttpServletRequest request) throws Exception {
+        Method validationMethod = validatorInstance.getClass().getDeclaredMethod(validateHeaders.validationFunction(), Set.class,
+                HttpServletRequest.class);
+        Object[] parameters = { headersSet, request };
+        return validationMethod.invoke(validatorInstance, parameters);
+    }
+
+    private void handleValidationFailure(HttpServletResponse response, Object methodResponse) throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonResponse = objectMapper.writeValueAsString(methodResponse);
+        response.setHeader("Content-Type", "application/json");
+        response.setStatus(HttpStatus.BAD_REQUEST.value());
+        response.getWriter().write(jsonResponse);
     }
 }
