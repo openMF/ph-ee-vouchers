@@ -51,7 +51,7 @@ dependencies {
     implementation "org.apache.camel:camel-endpointdsl:$camelVersion"
     implementation "org.apache.camel:camel-jetty:$camelVersion"
     implementation("io.camunda:zeebe-client-java:$zeebClientVersion")
-    implementation 'org.mifos:ph-ee-connector-common:1.9.0-SNAPSHOT'
+    implementation 'org.mifos:ph-ee-connector-common:1.9.1-SNAPSHOT'
     implementation 'org.json:json:20210307'
     checkstyle 'com.puppycrawl.tools:checkstyle:10.9.3'
     checkstyle 'com.github.sevntu-checkstyle:sevntu-checks:1.44.1'
