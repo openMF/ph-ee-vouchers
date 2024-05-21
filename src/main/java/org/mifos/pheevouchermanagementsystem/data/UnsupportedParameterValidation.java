@@ -5,9 +5,14 @@ import java.util.Map;
 import java.util.Set;
 import org.mifos.connector.common.validation.ValidationCodeType;
 import org.mifos.connector.common.validation.ValidatorBuilder;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
+@Component
 public class UnsupportedParameterValidation {
 
+    @Value("#{'${default_headers}'.split(',')}")
+    private Set<String> defaultHeader;
     final StringBuilder validationErrorCode = new StringBuilder("error.msg.parameter.unsupported");
 
     public void handleUnsupportedParameterValidation(Map<String, Object> additionalProperties, ValidatorBuilder validatorBuilder) {
@@ -26,7 +31,7 @@ public class UnsupportedParameterValidation {
     public void handleRequiredParameterValidation(List<String> fields, Set<String> requiredFields, ValidatorBuilder validatorBuilder) {
 
         for (final String fieldName : fields) {
-            if (fieldName != "additionalProperties" && !requiredFields.contains(fieldName)) {
+            if (fieldName != "additionalProperties" && !requiredFields.contains(fieldName) && !defaultHeader.contains(fieldName)) {
 
                 final StringBuilder defaultEnglishMessage = new StringBuilder("The parameter ").append(fieldName)
                         .append(" is not supported.");
