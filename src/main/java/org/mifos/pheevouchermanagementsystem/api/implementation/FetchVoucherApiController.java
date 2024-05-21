@@ -5,6 +5,9 @@ import org.mifos.pheevouchermanagementsystem.api.definition.FetchVoucherApi;
 import org.mifos.pheevouchermanagementsystem.data.FetchVoucherResponseDTO;
 import org.mifos.pheevouchermanagementsystem.repository.VoucherRepository;
 import org.mifos.pheevouchermanagementsystem.service.FetchVoucherService;
+import org.mifos.pheevouchermanagementsystem.service.ValidateHeaders;
+import org.mifos.pheevouchermanagementsystem.util.HeaderConstants;
+import org.mifos.pheevouchermanagementsystem.validator.HeaderValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -24,6 +27,8 @@ public class FetchVoucherApiController implements FetchVoucherApi {
     }
 
     @Override
+    @ValidateHeaders(requiredHeaders = {
+            HeaderConstants.X_REGISTERING_INSTITUTION_ID }, validatorClass = HeaderValidator.class, validationFunction = "validateForRegisteringInstitutionID")
     public ResponseEntity<FetchVoucherResponseDTO> fetchVoucher(String serialNumber, String registeringInstitutionId)
             throws ExecutionException, InterruptedException {
         if (registeringInstitutionId == null || registeringInstitutionId.isEmpty() || !voucherRepository.existsBySerialNo(serialNumber)) {
@@ -34,6 +39,8 @@ public class FetchVoucherApiController implements FetchVoucherApi {
     }
 
     @Override
+    @ValidateHeaders(requiredHeaders = {
+            HeaderConstants.X_REGISTERING_INSTITUTION_ID }, validatorClass = HeaderValidator.class, validationFunction = "validateForRegisteringInstitutionID")
     public ResponseEntity<Page<FetchVoucherResponseDTO>> fetchAllVouchers(String registeringInstitutionId, Integer page, Integer size)
             throws ExecutionException, InterruptedException {
         if (registeringInstitutionId == null || registeringInstitutionId.isEmpty()) {

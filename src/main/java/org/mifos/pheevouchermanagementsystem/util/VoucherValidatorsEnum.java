@@ -71,8 +71,7 @@ public enum VoucherValidatorsEnum implements ValidationCodeType {
             "Voucher secret number cannot be null or empty"), INVALID_VOUCHER_SECRET_NUMBER_LENGTH(
             "error.msg.schema.voucher.secret.number.length.is.invalid",
             "Voucher secret number length is invalid"), HEADER_VALIDATION_ERROR(
-            "error.msg.header.validation.errors",
-            "The headers are invalid"), INVALID_PROGRAM_ID_LENGTH(
+            "error.msg.header.validation.errors", "The headers are invalid"), INVALID_PROGRAM_ID_LENGTH(
             "error.msg.schema.program.id.length.is.invalid",
             "Program Id length is invalid");
 

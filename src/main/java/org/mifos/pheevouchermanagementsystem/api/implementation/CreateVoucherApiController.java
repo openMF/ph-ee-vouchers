@@ -13,6 +13,9 @@ import org.mifos.pheevouchermanagementsystem.data.ResponseDTO;
 import org.mifos.pheevouchermanagementsystem.exception.ConflictingDataException;
 import org.mifos.pheevouchermanagementsystem.exception.InstructionIdException;
 import org.mifos.pheevouchermanagementsystem.service.CreateVoucherService;
+import org.mifos.pheevouchermanagementsystem.service.ValidateHeaders;
+import org.mifos.pheevouchermanagementsystem.util.HeaderConstants;
+import org.mifos.pheevouchermanagementsystem.validator.HeaderValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +29,8 @@ public class CreateVoucherApiController implements CreateVoucherApi {
     CreateVoucherService createVoucherService;
 
     @Override
+    @ValidateHeaders(requiredHeaders = { HeaderConstants.X_PROGRAM_ID, HeaderConstants.X_REGISTERING_INSTITUTION_ID,
+            HeaderConstants.X_CALLBACKURL }, validatorClass = HeaderValidator.class, validationFunction = "validateCreateVoucher")
     public <T> ResponseEntity<T> createVouchers(String callbackURL, String programId, String registeringInstitutionId,
             RequestDTO requestBody) throws ExecutionException, InterruptedException, JsonProcessingException {
         try {

@@ -6,7 +6,10 @@ import static org.mifos.pheevouchermanagementsystem.util.VoucherManagementEnum.S
 import java.util.concurrent.ExecutionException;
 import org.mifos.pheevouchermanagementsystem.api.definition.VoucherValidityApi;
 import org.mifos.pheevouchermanagementsystem.data.ResponseDTO;
+import org.mifos.pheevouchermanagementsystem.service.ValidateHeaders;
 import org.mifos.pheevouchermanagementsystem.service.VoucherValidityService;
+import org.mifos.pheevouchermanagementsystem.util.HeaderConstants;
+import org.mifos.pheevouchermanagementsystem.validator.HeaderValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +22,8 @@ public class VoucherValidityApiController implements VoucherValidityApi {
     VoucherValidityService voucherValidityService;
 
     @Override
+    @ValidateHeaders(requiredHeaders = { HeaderConstants.X_PROGRAM_ID, HeaderConstants.X_REGISTERING_INSTITUTION_ID,
+            HeaderConstants.X_CALLBACKURL }, validatorClass = HeaderValidator.class, validationFunction = "validateVoucherLifecycle")
     public ResponseEntity<ResponseDTO> voucherValidity(String callbackURL, String registeringInstitutionId, String serialNumber,
             String voucherNumber, String groupCode, Boolean isValid) throws ExecutionException, InterruptedException {
         try {
