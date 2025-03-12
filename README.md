@@ -1,7 +1,7 @@
 # payment-hub-ee
 Payment Hub Enterprise Edition middleware for integration to real-time payment systems.
 
-For detailed documentation check the documentation: https://app.gitbook.com/@mifos/s/docs/payment-hub-ee/overview
+For detailed documentation check the documentation: https://mifos.gitbook.io/docs/payment-hub-ee/overview
 
 ## Spotless
 Use below command to execute the spotless apply.
