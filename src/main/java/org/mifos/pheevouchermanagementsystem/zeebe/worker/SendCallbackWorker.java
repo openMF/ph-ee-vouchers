@@ -35,7 +35,7 @@ public class SendCallbackWorker extends BaseWorker {
             if (existingVariables.get(PAYMENT_ADVICE).equals(true)) {
                 RedeemVoucherResponseDTO redeemVoucherResponseDTO = new RedeemVoucherResponseDTO(SUCCESS.getValue(),
                         "Voucher redemption successful", existingVariables.get("voucherSerialNumber").toString(), null,
-                        LocalDateTime.now(ZoneId.systemDefault()).toString(), existingVariables.get("transactionId").toString());
+                        LocalDateTime.now(ZoneId.systemDefault()).toString(), existingVariables.get("clientCorrelationId").toString());
                 ObjectMapper objectMapper = new ObjectMapper();
                 String body = objectMapper.writeValueAsString(redeemVoucherResponseDTO);
                 logger.info("Sending callback on URL: {}", existingVariables.get("callbackURL"));
@@ -43,7 +43,7 @@ public class SendCallbackWorker extends BaseWorker {
             } else {
                 RedeemVoucherResponseDTO redeemVoucherResponseDTO = new RedeemVoucherResponseDTO(SUCCESS.getValue(),
                         "Voucher redemption successful", existingVariables.get("voucherSerialNumber").toString(), null,
-                        LocalDateTime.now(ZoneId.systemDefault()).toString(), existingVariables.get("transactionId").toString());
+                        LocalDateTime.now(ZoneId.systemDefault()).toString(), existingVariables.get("clientCorrelationId").toString());
                 ObjectMapper objectMapper = new ObjectMapper();
                 String body = objectMapper.writeValueAsString(redeemVoucherResponseDTO);
                 logger.info("Sending callback on URL: {}", existingVariables.get("callbackURL"));
